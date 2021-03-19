@@ -22,99 +22,25 @@
         </el-select>
         <date-range-picker v-model="query.sdate" class="date-item" />
         <rrOperation />
-        <el-button
-          v-if="crud.optShow.download"
-          :loading="crud.downloadLoading"
-          :disabled="!crud.data.length"
-          class="filter-item"
-          size="mini"
-          type="warning"
-          icon="el-icon-download"
-          @click="exportExels(defaultTime)"
-        >导出</el-button>
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
-        <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="gameName" align="center" label="游戏名" />
-        <el-table-column prop="gameCode" align="center" label="gameCode" />
-        <el-table-column prop="totalGameUserNum" align="center" label="总用户" />
-        <el-table-column prop="totalGameUserNumIos" align="center" label="总用户IOS" />
-        <el-table-column prop="totalGameUserNumAndroid" align="center" label="总用户安卓" />
-        <el-table-column prop="totalGameUserNumFbins" align="center" label="总用fbins" />
-        <el-table-column prop="dateList" align="center" width="100px" label="日期">
+      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+        <el-table-column prop="gameName" align="center" label="游戏名">
           <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dateList"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
+            <p>{{ scope.row.gameName }}</p>
+            <p>{{ scope.row.gameCode }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="dayLoginUid" align="center" label="日登入DAU">
+        <el-table-column prop="allLpoint" align="center" label="总储值UID" />
+        <el-table-column prop="allUSD" align="center" label="总储值USD(2020.5.16开始的数据)" />
+        <el-table-column prop="allUid" align="center" label="总储值TWD" />
+        <el-table-column prop="dayUid" align="center" width="100px" label="日储值UID">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayLoginUid"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dayAllEverPayUid" align="center" label="日儲值用戶DAU">
-          <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dayAllEverPayUid"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dayPayUid" align="center" label="日总储值UID">
-          <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dayPayUid"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dayNewRegUid" align="center" label="日注册UID">
-          <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dayNewRegUid"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dayNewPayUid" align="center" label="日新增储值UID">
-          <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dayNewPayUid"
-              :key="item.key"
-              class="open"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dayNewRegPayUid" align="center" label="日注册儲值UID">
-          <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.dayNewRegPayUid"
+              v-for="item of scope.row.dayUid"
               :key="item.key"
               class="open"
             >
@@ -133,6 +59,17 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="dayNewUid" align="center" label="日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="dayNewUSD" align="center" label="日新增储值USD">
           <template slot-scope="scope">
             <div
@@ -144,10 +81,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayNewRegUSD" align="center" label="日注册储值USD">
+        <el-table-column prop="dayUidIos" align="center" label="Ios日储值Uid">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayNewRegUSD"
+              v-for="item of scope.row.dayUidIos"
               :key="item.key"
               class="open"
             >
@@ -155,10 +92,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayPayRate" align="center" label="日付费率">
+        <el-table-column prop="dayUSDIos" align="center" label="Ios日储值USD">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayPayRate"
+              v-for="item of scope.row.dayUSDIos"
               :key="item.key"
               class="open"
             >
@@ -166,10 +103,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayNewRegPayRate" align="center" label="日注冊付费率">
+        <el-table-column prop="dayNewUidIos" align="center" label="Ios日新增储值UID">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayNewRegPayRate"
+              v-for="item of scope.row.dayNewUidIos"
               :key="item.key"
               class="open"
             >
@@ -177,10 +114,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayUsdArpu" align="center" label="日Arpu[USD]">
+        <el-table-column prop="dayNewUSDIos" align="center" label="Ios日新增储值USD">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayUsdArpu"
+              v-for="item of scope.row.dayNewUSDIos"
               :key="item.key"
               class="open"
             >
@@ -188,10 +125,208 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayUsdArppu" align="center" label="日Arppu[USD]">
+        <el-table-column prop="dayUidAndroid" align="center" label="Andr日储值Uid">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayUsdArppu"
+              v-for="item of scope.row.dayUidAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUSDAndroid" align="center" label="Andr日储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUSDAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUidAndroid" align="center" label="Andr日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUidAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUSDAndroid" align="center" label="Andr日新增储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUSDAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUidFbins" align="center" label="fbins日储值Uid">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUidFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUSDFbins" align="center" label="fbins日储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUSDFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUidFbins" align="center" label="fbins日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUidFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUSDFbins" align="center" label="fbins日新增储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUSDFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUidPartner" align="center" label="partner日储值Uid">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUidPartner"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUSDPartner" align="center" label="partner日储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUSDPartner"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUidPartner" align="center" label="partner日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUidPartner"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUidWebsite" align="center" label="Website日储值Uid">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUidWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUSDWebsite" align="center" label="Website日储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUSDWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUidWebsite" align="center" label="Website日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUidWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUSDWebsite" align="center" label="Website日新增储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUSDWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUidOthers" align="center" label="others日储值Uid">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUidOthers"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayUSDOthers" align="center" label="others日储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayUSDOthers"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUidOthers" align="center" label="others日新增储值UID">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUidOthers"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewUSDOthers" align="center" label="others日新增储值USD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewUSDOthers"
               :key="item.key"
               class="open"
             >
@@ -221,10 +356,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayNewRegLpoint" align="center" label="日注册储值TWD">
+        <el-table-column prop="dayLpointIos" align="center" label="Ios日储值TWD">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayNewRegLpoint"
+              v-for="item of scope.row.dayLpointIos"
               :key="item.key"
               class="open"
             >
@@ -232,10 +367,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayArpu" align="center" label="日Arpu">
+        <el-table-column prop="dayNewLpointIos" align="center" label="Ios日新增储值TWD">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayArpu"
+              v-for="item of scope.row.dayNewLpointIos"
               :key="item.key"
               class="open"
             >
@@ -243,10 +378,109 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="dayArppu" align="center" label="日Arppu">
+        <el-table-column prop="dayLpointAndroid" align="center" label="Andr日储值TWD">
           <template slot-scope="scope">
             <div
-              v-for="item of scope.row.dayArppu"
+              v-for="item of scope.row.dayLpointAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewLpointAndroid" align="center" label="Andr日新增储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewLpointAndroid"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayLpointFbins" align="center" label="fbins日储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayLpointFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewLpointFbins" align="center" label="fbins日新增储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewLpointFbins"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayLpointPartner" align="center" label="partner日储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayLpointPartner"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewLpointPartner" align="center" label="partner日新增储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewLpointPartner"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayLpointWebsite" align="center" label="Website日储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayLpointWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewLpointWebsite" align="center" label="Website日新增储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewLpointWebsite"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayLpointOthers" align="center" label="others日储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayLpointOthers"
+              :key="item.key"
+              class="open"
+            >
+              {{ item }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dayNewLpointOthers" align="center" label="others日新增储值TWD">
+          <template slot-scope="scope">
+            <div
+              v-for="item of scope.row.dayNewLpointOthers"
               :key="item.key"
               class="open"
             >
@@ -311,7 +545,7 @@ export default {
         this.gameOptions = res.gameCodeList
       })
     },
-    exportExels(date) {
+    exportExels() {
       var params = this.crud.getQueryParams()
       params.gameCode = this.getSelectData
       download(params)

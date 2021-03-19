@@ -4,7 +4,7 @@ import qs from 'qs'
 
 export function gameCodeLists() {
   return request({
-    url: 'api/gmDateReport/gameCodeList',
+    url: '/api/gmDateReport/gameCodeList',
     method: 'get'
   })
 }
@@ -14,9 +14,10 @@ export function gameCodeList() {
     method: 'get'
   })
 }
-export function download(params) {
+export function download(url, params) {
+  console.log(url)
   return request({
-    url: '/api/gmDateReport/download' + '?' + qs.stringify(params, { indices: false }),
+    url: url + '?' + qs.stringify(params, { indices: false }),
     method: 'get'
   })
 }

@@ -4,7 +4,7 @@ import qs from 'qs'
 
 export function gameCodeLists() {
   return request({
-    url: 'api/gmDateStoreReport/gameCodeList',
+    url: 'api/gmDateStoreReport/getGameList',
     method: 'get'
   })
 }

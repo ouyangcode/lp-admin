@@ -41,7 +41,7 @@
         删除
       </el-button>
       <el-button
-        v-if="hide"
+        v-if="crud.optShow.download"
         :loading="crud.downloadLoading"
         :disabled="!crud.data.length"
         class="filter-item"

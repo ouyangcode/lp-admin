@@ -30,17 +30,20 @@
           size="mini"
           type="warning"
           icon="el-icon-download"
-          @click="exportExels(defaultTime)"
+          @click="exportExels()"
         >导出</el-button>
       </div>
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
-        <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="gameName" align="center" label="游戏名" />
-        <el-table-column prop="gameCode" align="center" label="gameCode" />
+      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+        <el-table-column prop="gameName" align="center" label="游戏名">
+          <template slot-scope="scope">
+            <p>{{ scope.row.gameName }}</p>
+            <p>{{ scope.row.gameCode }}</p>
+          </template>
+        </el-table-column>
         <el-table-column prop="totalGameUserNum" align="center" label="总用户" />
         <el-table-column prop="totalGameUserNumIos" align="center" label="总用户IOS" />
         <el-table-column prop="totalGameUserNumAndroid" align="center" label="总用户安卓" />
@@ -311,7 +314,7 @@ export default {
         this.gameOptions = res.gameCodeList
       })
     },
-    exportExels(date) {
+    exportExels() {
       var params = this.crud.getQueryParams()
       params.gameCode = this.getSelectData
       download(params)
