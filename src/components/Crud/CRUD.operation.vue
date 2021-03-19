@@ -41,7 +41,7 @@
         删除
       </el-button>
       <el-button
-        v-if="crud.optShow.download"
+        v-if="hide"
         :loading="crud.downloadLoading"
         :disabled="!crud.data.length"
         class="filter-item"
@@ -141,7 +141,8 @@ export default {
       allColumnsSelectedIndeterminate: false,
       tableUnwatcher: null,
       // 忽略下次表格列变动
-      ignoreNextTableColumnsChange: false
+      ignoreNextTableColumnsChange: false,
+      hide: false
     }
   },
   watch: {

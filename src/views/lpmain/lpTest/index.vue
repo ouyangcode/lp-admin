@@ -53,43 +53,43 @@
 </template>
 
 <script>
-  import crudLpTest from '@/api/lpmain/lpTest'
-  import CRUD, { presenter, header, form, crud } from '@crud/crud'
-  import rrOperation from '@crud/RR.operation'
-  import crudOperation from '@crud/CRUD.operation'
-  import udOperation from '@crud/UD.operation'
-  import pagination from '@crud/Pagination'
+import crudLpTest from '@/api/lpmain/lpTest'
+import CRUD, { presenter, header, form, crud } from '@crud/crud'
+import rrOperation from '@crud/RR.operation'
+import crudOperation from '@crud/CRUD.operation'
+import udOperation from '@crud/UD.operation'
+import pagination from '@crud/Pagination'
 
-  const defaultForm = { id: null, uname: null, passport: null, stime: null }
-  export default {
-    name: 'LpTest',
-    components: { pagination, crudOperation, rrOperation, udOperation },
-    mixins: [presenter(), header(), form(defaultForm), crud()],
-    cruds() {
-      return CRUD({ title: 'soho測試生成', url: 'api/lpTest', idField: 'id', sort: 'id,desc', crudMethod: { ...crudLpTest }})
-    },
-    data() {
-      return {
-        permission: {
-          add: ['admin', 'lpTest:add'],
-          edit: ['admin', 'lpTest:edit'],
-          del: ['admin', 'lpTest:del']
-        },
-        rules: {
-        },
-        queryTypeOptions: [
-          { key: 'uname', display_name: '用户名' },
-          { key: 'passport', display_name: 'passport' }
-        ]
-      }
-    },
-    methods: {
-      // 钩子：在获取表格数据之前执行，false 则代表不获取数据
-      [CRUD.HOOK.beforeRefresh]() {
-        return true
-      }
+const defaultForm = { id: null, uname: null, passport: null, stime: null }
+export default {
+  name: 'LpTest',
+  components: { pagination, crudOperation, rrOperation, udOperation },
+  mixins: [presenter(), header(), form(defaultForm), crud()],
+  cruds() {
+    return CRUD({ title: 'soho測試生成', url: 'api/lpTest', idField: 'id', sort: 'id,desc', crudMethod: { ...crudLpTest }})
+  },
+  data() {
+    return {
+      permission: {
+        add: ['admin', 'lpTest:add'],
+        edit: ['admin', 'lpTest:edit'],
+        del: ['admin', 'lpTest:del']
+      },
+      rules: {
+      },
+      queryTypeOptions: [
+        { key: 'uname', display_name: '用户名' },
+        { key: 'passport', display_name: 'passport' }
+      ]
+    }
+  },
+  methods: {
+    // 钩子：在获取表格数据之前执行，false 则代表不获取数据
+    [CRUD.HOOK.beforeRefresh]() {
+      return true
     }
   }
+}
 </script>
 
 <style scoped>

@@ -4,19 +4,19 @@ import qs from 'qs'
 
 export function gameCodeLists() {
   return request({
-    url: 'api/gmDateReport/gameCodeList',
+    url: 'api/gmDateStoreReport/gameCodeList',
     method: 'get'
   })
 }
 export function gameCodeList() {
   return request({
-    url: 'api/gmDateReport/reportList',
+    url: 'api/gmDateStoreReport/reportList',
     method: 'get'
   })
 }
 export function download(params) {
   return request({
-    url: '/api/gmDateReport/download' + '?' + qs.stringify(params, { indices: false }),
+    url: '/api/gmDateStoreReport/download' + '?' + qs.stringify(params, { indices: false }),
     method: 'get'
   })
 }

@@ -262,7 +262,7 @@
 </template>
 
 <script>
-import { lpGmDateReport, gameCodeList, download } from '@/api/lpmain/gmDateReport'
+import { lpGmDateStoreReport, gameCodeList, download } from '@/api/lpmain/gmDateStoreReport'
 import { downloadFile } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
@@ -271,11 +271,11 @@ import DateRangePicker from '@/components/DateRangePicker'
 import pagination from '@crud/Pagination'
 const defaultForm = { gameCode: null, sdate: null }
 export default {
-  name: 'GmDateReport',
+  name: 'GmDateStoreReport',
   components: { rrOperation, DateRangePicker, crudOperation, pagination },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'soho測試生成', url: 'api/gmDateReport/reportList', crudMethod: { ...lpGmDateReport }})
+    return CRUD({ title: 'soho測試生成', url: 'api/gmDateStoreReport/reportList', crudMethod: { ...lpGmDateStoreReport }})
   },
   data() {
     return {
