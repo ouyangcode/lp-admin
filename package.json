@@ -1,8 +1,8 @@
 {
   "name": "eladmin-web",
   "version": "2.6.0",
-  "description": "EL-ADMIN 前端源码",
-  "author": "Zheng Jie",
+  "description": "LP",
+  "author": "Ch",
   "license": "Apache-2.0",
   "scripts": {
     "dev": "vue-cli-service serve",
