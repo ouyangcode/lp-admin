@@ -385,4 +385,15 @@ export function downloadFile(obj, name, suffix) {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+
+  // const blob = new Blob([obj])
+  // const downloadElement = document.createElement('a')
+  // const href = window.URL.createObjectURL(blob)
+  // const fileName = parseTime(new Date()) + '-' + name + '.' + suffix
+  // downloadElement.href = href
+  // downloadElement.download = fileName
+  // document.body.appendChild(downloadElement)
+  // downloadElement.click()
+  // document.body.removeChild(downloadElement)
+  // window.URL.revokeObjectURL(href)
 }

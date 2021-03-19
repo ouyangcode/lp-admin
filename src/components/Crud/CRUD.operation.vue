@@ -141,7 +141,8 @@ export default {
       allColumnsSelectedIndeterminate: false,
       tableUnwatcher: null,
       // 忽略下次表格列变动
-      ignoreNextTableColumnsChange: false
+      ignoreNextTableColumnsChange: false,
+      hide: false
     }
   },
   watch: {

@@ -1,5 +1,14 @@
-import { initData, download } from '@/api/data'
-import { parseTime, downloadFile } from '@/utils/index'
+import {
+  initData,
+  download
+} from '@/api/data'
+import {
+  parseTime,
+  downloadFile
+} from '@/utils/index'
+import {
+  Object
+} from 'core-js'
 import Vue from 'vue'
 
 /**
@@ -19,8 +28,15 @@ function CRUD(options) {
     title: '',
     // 请求数据的url
     url: '',
+    getQueryTitle: '',
     // 表格数据
     data: [],
+    isBlack: false,
+    isWhite: false,
+    // 筛选
+    fillterData: [],
+    spoeData: [],
+    gameCodeList: [],
     // 选择项
     selections: [],
     // 待查询的对象
@@ -137,8 +153,110 @@ function CRUD(options) {
             table.store.states.treeData = {}
             table.store.states.lazyTreeNodeMap = {}
           }
+          if (crud.getQueryParams().gameCode && crud.getQueryParams().packageName) {
+            crud.getQueryTitle = 'ip,passport'
+          }
+          if (crud.getQueryParams().gameCode && crud.getQueryParams().packageName && crud.getQueryParams().passport) {
+            crud.getQueryTitle = 'ip,gameCode,packageName'
+          }
           crud.page.total = data.totalElements
-          crud.data = data.content
+          var date = new Date()
+          var year = date.getFullYear()
+          var yearTotalArray = []
+          var yearArray = []
+          const toObject = {}
+          var n = 0
+          for (var i = 2012; i <= year; i++) {
+            yearArray[n] = i
+            yearTotalArray[i] = 0
+            n++
+          }
+          var toExep = /^\/api\/detectThirdPartyPayOpen\//
+          if (crud.url === 'api/gmPayGameYearReport/reportList') {
+            var values = Object.values(data.content[0])
+            var keys = Object.keys(data.content[0])
+            values.forEach((item, index) => {
+              item.gameCode = keys[index]
+            })
+
+            for (var key in data.content[0]) {
+              var value = data.content[0][key]
+              yearArray.forEach((res, keys) => {
+                var yvalue = value[yearArray[keys]]
+                if (yvalue != null && yvalue !== undefined) {
+                  yvalue = Math.round(yvalue)
+                  yearTotalArray[yearArray[keys]] = yearTotalArray[yearArray[keys]] + yvalue
+                }
+              })
+            }
+
+            yearTotalArray.forEach((item, index) => {
+              toObject[index] = item
+            })
+            crud.fillterData = [toObject]
+            crud.data = values
+          } else if (crud.url === '/api/detectPay/getALLUserAllowPayDevice') {
+            if (data.content[0].code === '003') {
+              crud.data = []
+            } else {
+              var arrs = []
+              var infoMap = data.content[0].rst.deviceValue
+
+              crud.data = crud.putObject(infoMap)
+              console.log(crud.data)
+            }
+          } else if (crud.url === '/api/detectPay/getAllPayDeviceAllUserID') {
+            if (data.content[0].code === '003') {
+              crud.data = []
+            } else {
+              infoMap = data.content[0].rst.rst
+              crud.data = crud.putObjectT(infoMap)
+              console.log(crud.data)
+            }
+          } else if (crud.url === '/api/detectPay/getAllCollectCurrencyPayIOS') {
+            if (data.content[0].code === '003') {
+              crud.data = []
+            } else {
+              infoMap = data.content[0].rst.currencyValue
+
+              crud.data = crud.putObjectT(infoMap)
+              console.log(crud.data)
+            }
+          } else if (crud.url === '/api/detectPay/getAllowCurrencyPayIOS') {
+            if (data.content[0].code === '003') {
+              crud.data = []
+            } else {
+              arrs = []
+              infoMap = data.content[0].rst.currencyValue
+              infoMap.forEach((item, index) => {
+                arrs[index] = {
+                  objKey: item[0],
+                  objVal: item[1]
+                }
+              })
+              arrs = (infoMap)
+              crud.data = arrs
+              console.log(crud.data)
+            }
+          } else if (toExep.test(crud.url)) {
+            if (data.content[0].code === '004') {
+              crud.data = []
+            } else {
+              infoMap = data.content[0].rst.rstMap
+
+              crud.data = crud.putObjectT(infoMap, crud.url)
+              console.log(crud.data)
+            }
+          } else if (crud.url === '/api/lpuserGamelimit/getLpuserGamelimitList') {
+            crud.data = data.content
+            var shiftData = { gameName: '所有游戏', gameCode: 'allgame' }
+            data.gameCodeList.unshift(shiftData)
+            crud.data.gameCodeList = data.gameCodeList
+          } else {
+            crud.data = data.content
+            crud.data.gameCodeList = data.gameCodeList
+            console.log(crud.data)
+          }
           crud.resetDataStatus()
           // time 毫秒后显示表格
           setTimeout(() => {
@@ -151,6 +269,47 @@ function CRUD(options) {
           reject(err)
         })
       })
+    },
+    /**
+     * 将后端传过来的数据优化
+     */
+    putObject(obj) {
+      const getArr = Object.entries(obj)
+      var arrs = []
+      var valueForObj
+      var isBloc
+      getArr.forEach((item, index) => {
+        valueForObj = item[1].split(',')
+        if (valueForObj[0] === 'notAllow' || valueForObj[0] === 'forbidden') {
+          isBloc = true
+        } else {
+          isBloc = false
+        }
+        arrs[index] = {
+          objKey: item[0],
+          objVal: item[1],
+          isshow: isBloc
+        }
+      })
+
+      return arrs
+    },
+    putObjectT(obj, url) {
+      const getArr = Object.entries(obj)
+      var arrs = []
+      if (url === '/api/detectThirdPartyPayOpen/getUserGooglePayInfo') {
+        arrs.push(obj)
+      } else {
+        getArr.forEach((item, index) => {
+          arrs[index] = {
+            id: index,
+            objKey: item[0],
+            objVal: item[1]
+          }
+        })
+      }
+
+      return arrs
     },
     /**
      * 启动添加
@@ -329,7 +488,7 @@ function CRUD(options) {
      */
     doExport() {
       crud.downloadLoading = true
-      download(crud.url + '/download', crud.getQueryParams()).then(result => {
+      download('/api/gmDateReport/download', crud.getQueryParams()).then(result => {
         downloadFile(result, crud.title + '数据', 'xlsx')
         crud.downloadLoading = false
       }).catch(() => {
@@ -416,6 +575,7 @@ function CRUD(options) {
      */
     resetDataStatus() {
       const dataStatus = {}
+
       function resetStatus(datas) {
         datas.forEach(e => {
           dataStatus[crud.getDataId(e)] = {
@@ -458,7 +618,9 @@ function CRUD(options) {
      */
     selectChange(selection, row) {
       // 如果selection中存在row代表是选中，否则是取消选中
-      if (selection.find(val => { return crud.getDataId(val) === crud.getDataId(row) })) {
+      if (selection.find(val => {
+        return crud.getDataId(val) === crud.getDataId(row)
+      })) {
         if (row.children) {
           row.children.forEach(val => {
             crud.getTable().toggleRowSelection(val, true)

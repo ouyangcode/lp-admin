@@ -10,7 +10,7 @@ export function initData(url, params) {
 
 export function download(url, params) {
   return request({
-    url: url + '?' + qs.stringify(params, { indices: false }),
+    url: url + '?' + qs.stringify(params, { responseType: 'blob' }),
     method: 'get',
     responseType: 'blob'
   })
