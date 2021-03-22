@@ -217,19 +217,13 @@ export default {
       console.log(this.crud.data.gameCodeList)
       var splitArr = data.gamecode.split(',')
 
-      splitArr.forEach((items, indexs) => {
-        this.crud.data.gameCodeList.forEach((item, index) => {
-          if (item.gameCode === items) {
-            splitArr[indexs] = item.gameCode
-          } else {
-
-          // splitArr = []
-          }
-        })
+      var getSplitArr = []
+      this.crud.data.gameCodeList.forEach((item, index) => {
+        if (splitArr.indexOf(item.gameCode) !== -1) {
+          getSplitArr.push(item.gameCode)
+        }
       })
-
-      console.log(splitArr)
-      this.checkedCities = splitArr
+      this.checkedCities = getSplitArr
       this.isShowDelg = !this.isShowDelg
       this.scopeData = data
       this.curdHook = 'edit'
