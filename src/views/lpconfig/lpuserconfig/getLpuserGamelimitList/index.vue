@@ -216,7 +216,6 @@ export default {
       }
       this.checkedCities = data.gamecode.split(',')
       this.isShowDelg = !this.isShowDelg
-      //   this.scopeData.gamecode = data.gamecode.split(',')
       this.scopeData = data
       this.curdHook = 'edit'
     },
