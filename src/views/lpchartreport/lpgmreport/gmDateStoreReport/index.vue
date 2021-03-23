@@ -20,7 +20,7 @@
             :value="item.gameCode"
           />
         </el-select>
-        <van-calendar v-model="isVisible" type="range" @confirm="onConfirm" />
+        <van-calendar v-model="isVisible" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
         <template v-if="!isShowTime">
           <div class="changDate">
             <input
@@ -36,6 +36,7 @@
               clearable
               placeholder="结束时间"
               class="filter-item"
+              @click="hovePick"
             >
             <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
           </div>
@@ -49,7 +50,7 @@
 
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
-        <el-table-column prop="gameName" align="center" label="游戏名">
+        <el-table-column prop="gameName" align="center" fixed label="游戏名">
           <template slot-scope="scope">
             <p>{{ scope.row.gameName }}</p>
             <p>{{ scope.row.gameCode }}</p>
@@ -546,7 +547,9 @@ export default {
       isVisible: false,
       isHidd: false,
       startrtime: '',
-      endrtime: ''
+      endrtime: '',
+      minDate: new Date(2012, 1, 1),
+      maxDate: new Date(2030, 1, 31)
     }
   },
   created() {

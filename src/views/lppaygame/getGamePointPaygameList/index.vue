@@ -86,7 +86,7 @@
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
-          <van-calendar v-model="isVisible" type="range" @confirm="onConfirm" />
+          <van-calendar v-model="isVisible" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
           <template v-if="!isShowTime">
             <div class="changDate">
               <input
@@ -102,6 +102,7 @@
                 clearable
                 placeholder="结束时间"
                 class="filter-item"
+                @click="hovePick"
               >
               <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
             </div>
@@ -390,7 +391,9 @@ export default {
       isVisible: false,
       isHidd: false,
       startrtime: '',
-      endrtime: ''
+      endrtime: '',
+      minDate: new Date(2012, 1, 1),
+      maxDate: new Date(2030, 1, 31)
     }
   },
   created: function() {

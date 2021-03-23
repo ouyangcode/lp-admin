@@ -68,7 +68,7 @@
       />
       <el-popover
         placement="bottom-end"
-        width="150"
+        width="100"
         trigger="click"
       >
         <el-button
@@ -96,6 +96,7 @@
         >
           {{ item.label }}
         </el-checkbox>
+
       </el-popover>
     </el-button-group>
   </div>
@@ -253,7 +254,7 @@ export default {
 }
 </script>
 
-<style>
+<style rel="stylesheet/scss" lang="scss" scoped >
   .crud-opts {
     padding: 4px 0;
     display: -webkit-flex;
@@ -273,6 +274,7 @@ export default {
     display: -webkit-flex;
     display: flex;
     align-items: center;
+
   }
   }
 </style>

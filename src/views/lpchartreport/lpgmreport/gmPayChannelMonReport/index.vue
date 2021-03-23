@@ -18,7 +18,7 @@
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="medium" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="medium" style="width: 100%;">
         <el-table-column prop="month" align="center" label="日期" />
         <el-table-column prop="totalPoint" align="center" label="总金额" />
         <el-table-column prop="channelInfo" align="center" label="渠道">
@@ -85,7 +85,10 @@ export default {
         { key: 'gameCode', display_name: '游戏代码' }
       ],
       gameOptions: [],
-      getSelectData: ''
+      getSelectData: '',
+      tableHeight: 100,
+      minDate: new Date(2012, 1, 1),
+      maxDate: new Date(2030, 1, 31)
     }
   },
   created() {
@@ -95,6 +98,17 @@ export default {
       del: false,
       download: true
     }
+  },
+  mounted: function() {
+    this.$nextTick(function() {
+      this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50
+
+      // 监听窗口大小变化
+      const self = this
+      window.onresize = function() {
+        self.tableHeight = window.innerHeight - self.$refs.table.$el.offsetTop - 50
+      }
+    })
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
