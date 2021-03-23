@@ -86,6 +86,26 @@
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
+          <van-calendar v-model="isVisible" type="range" @confirm="onConfirm" />
+          <template v-if="!isShowTime">
+            <div class="changDate">
+              <input
+                v-model="startrtime"
+                clearable
+                placeholder="开始时间"
+                class="filter-item inp_enll"
+                @click="hovePick"
+              >
+              <span>:</span>
+              <input
+                v-model="endrtime"
+                clearable
+                placeholder="结束时间"
+                class="filter-item"
+              >
+              <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
+            </div>
+          </template>
           <el-date-picker
             v-if="isShowTime"
             v-model="query.crtime"
@@ -254,7 +274,7 @@
 import { GetGamePointPaygameList } from '@/api/lppaygame/getGamePointPaygameList'
 import { getAllGameCode } from '@/api/lpgame/getGameServerList'
 import { download } from '@/api/data'
-import { downloadFile } from '@/utils/index'
+import { downloadFile, parseTimes } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -366,7 +386,11 @@ export default {
       gameItemList: [],
       getSelVal: '',
       flag: null,
-      isShowTime: true
+      isShowTime: true,
+      isVisible: false,
+      isHidd: false,
+      startrtime: '',
+      endrtime: ''
     }
   },
   created: function() {
@@ -409,6 +433,23 @@ export default {
         })
       }
     },
+    hovePick() {
+      this.isVisible = !this.isVisible
+    },
+    onConfirm(date) {
+      const [start, end] = [parseTimes(date[0]), parseTimes(date[1])]
+      console.log([start, end])
+      this.isHidd = !this.isHidd
+      this.startrtime = start
+      this.endrtime = end
+      this.query.ctrime = [start, end]
+      this.isVisible = !this.isVisible
+    },
+    delInp() {
+      this.startrtime = ''
+      this.endrtime = ''
+      this.isHidd = !this.isHidd
+    },
     isMobile() {
       const flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
       return flag
@@ -419,9 +460,43 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-// .crud-opts {
-//   // display: none;
-// }
+.changDate {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 10px;
+  height: 30.5px !important;
+  width: 230px !important;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  span {
+    margin: 0 10px;
+  }
+  input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    display: inline-block;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 39%;
+    text-align: center;
+    font-size: 14px;
+    color: #606266;
+  }
+  .closeInp {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.35rem;
+    font-size: 14px;
+  }
+}
 ::v-deep .crud-opts-left {
   display: none;
 }

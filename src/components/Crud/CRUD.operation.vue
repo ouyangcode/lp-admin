@@ -263,4 +263,16 @@ export default {
   .crud-opts .crud-opts-right {
     margin-left: auto;
   }
+
+  @media screen and (max-width:486px) {
+    .crud-opts {
+    float: right;
+    position: relative;
+    top: -3px;
+    padding: 4px 0;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+  }
+  }
 </style>

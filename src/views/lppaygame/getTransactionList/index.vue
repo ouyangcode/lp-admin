@@ -21,7 +21,29 @@
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
         />
+        <van-calendar v-model="isVisible" type="range" @confirm="onConfirm" />
+        <template v-if="!isShowTime">
+          <div class="changDate">
+            <input
+              v-model="startrtime"
+              clearable
+              placeholder="开始时间"
+              class="filter-item inp_enll"
+              @click="hovePick"
+            >
+            <span>:</span>
+            <input
+              v-model="endrtime"
+              clearable
+              placeholder="结束时间"
+              class="filter-item"
+            >
+            <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
+          </div>
+        </template>
+
         <el-date-picker
+          v-if="isShowTime"
           v-model="query.crtime"
           :default-time="['00:00:00', '23:59:59']"
           type="daterange"
@@ -32,14 +54,14 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
         />
-        <rrOperation />
       </div>
+      <rrOperation />
       <crudOperation :permission="permission" />
       <!--表格渲染-->
       <el-table
         ref="table"
         v-loading="crud.loading"
-        :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+        :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
         :data="crud.data"
         size="small"
         style="width: 100%"
@@ -88,31 +110,16 @@
           label="交易的金额"
           width="100px"
         />
-        <el-table-column
-          align="center"
-          prop="type"
-          label="状态"
-          width="180px"
-        >
+        <el-table-column align="center" prop="type" label="状态" width="180px">
           <template slot-scope="scope">
-            <div
-              v-if="scope.row.type === 0"
-            >{{ "平台用户兑换" }}</div>
-            <div
-              v-if="scope.row.type === 1"
-            >{{ "平台用户充值" }}</div>
-            <div
-              v-if="scope.row.type === 2"
-            >{{ "FB用户充值直接进游戏" }}</div>
-            <div
-              v-if="scope.row.type === 5"
-            >{{ "合作商充值直接进游戏" }}</div>
-            <div
-              v-if="scope.row.type === 6"
-            >{{ "转点,回馈点数或者储值错账号" }}</div>
-            <div
-              v-if="scope.row.type === 7"
-            >{{ "补点" }}</div>
+            <div v-if="scope.row.type === 0">{{ "平台用户兑换" }}</div>
+            <div v-if="scope.row.type === 1">{{ "平台用户充值" }}</div>
+            <div v-if="scope.row.type === 2">{{ "FB用户充值直接进游戏" }}</div>
+            <div v-if="scope.row.type === 5">{{ "合作商充值直接进游戏" }}</div>
+            <div v-if="scope.row.type === 6">
+              {{ "转点,回馈点数或者储值错账号" }}
+            </div>
+            <div v-if="scope.row.type === 7">{{ "补点" }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -131,12 +138,7 @@
           label="交易说明"
           width="200px"
         />
-        <el-table-column
-          align="center"
-          prop="ip"
-          label="ip"
-          width="130px"
-        />
+        <el-table-column align="center" prop="ip" label="ip" width="130px" />
         <el-table-column
           align="center"
           prop="tradeTime"
@@ -157,9 +159,8 @@
 </template>
 
 <script>
-import {
-  transaction
-} from '@/api/lppaygame/getTransactionList'
+import { transaction } from '@/api/lppaygame/getTransactionList'
+import { parseTimes } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -201,40 +202,9 @@ export default {
   data() {
     return {
       isShow: false,
-      isShowDelg: false,
-      isPlayVideo: false,
-      isShowOtherType: true,
-      checkedSel: false,
-      inputContent: '',
-      timer: null,
-      getMsg: '',
-      getDefualDate: null,
-      getLastDate: null,
-      isSendMsg: true,
-      activeIndex: '1',
-      defaultTime: [],
-      valuenum: null,
-      scopeData: {
-        id: null,
-        status: null,
-        passport: null,
-        username: null,
-        lunplay_orderID: null,
-        money: null,
-        productID: null,
-        serverCode: null,
-        payGame_lpoint: null,
-        time: null,
-        packageName: null,
-        siteCode: null,
-        ipAddress: null,
-        country: null,
-        pay_tag: null,
-        Lpoint: null,
-        gameCode: null,
-        transactionID: null,
-        roleid: null
-      },
+      isVisible: false,
+      isVisibles: false,
+      isHidd: false,
       permission: {
         add: ['admin', 'getTransactionList:add'],
         edit: ['admin', 'getTransactionList:edit'],
@@ -248,19 +218,59 @@ export default {
           { required: true, message: '是否删除状态不能为空', trigger: 'blur' }
         ]
       },
-      gameOptions: ['减L点', '加L点', '加完即减L点', '退点,游戏点数退还成L点', '退款,L点退还成现金', '直充游戏点数', '转点', '为玩家补游戏币'],
+      gameOptions: [
+        '减L点',
+        '加L点',
+        '加完即减L点',
+        '退点,游戏点数退还成L点',
+        '退款,L点退还成现金',
+        '直充游戏点数',
+        '转点',
+        '为玩家补游戏币'
+      ],
       oContent: {},
       msgs: [],
-      serviceValue: ''
+      serviceValue: '',
+      startrtime: '',
+      endrtime: '',
+      flag: null,
+      isShowTime: true,
+      show: false,
+      data: []
     }
   },
   created: function() {
-
+    if (this.isMobile()) {
+      this.isShowTime = false
+    }
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
     [CRUD.HOOK.beforeRefresh]() {
       return true
+    },
+    hovePick() {
+      this.isVisible = !this.isVisible
+    },
+    onConfirm(date) {
+      const [start, end] = [parseTimes(date[0]), parseTimes(date[1])]
+      console.log([start, end])
+      this.isHidd = !this.isHidd
+      this.startrtime = start
+      this.endrtime = end
+      this.query.ctrime = [start, end]
+      this.isVisible = !this.isVisible
+    },
+    delInp() {
+      this.startrtime = ''
+      this.endrtime = ''
+      this.isHidd = !this.isHidd
+    },
+    isMobile() {
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+      return flag
     }
   }
 }
@@ -270,6 +280,44 @@ export default {
 // .crud-opts {
 //   // display: none;
 // }
+
+.changDate {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 10px;
+  height: 30.5px !important;
+  width: 230px !important;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  span {
+    margin: 0 10px;
+  }
+  input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    display: inline-block;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 39%;
+    text-align: center;
+    font-size: 14px;
+    color: #606266;
+  }
+  .closeInp {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.35rem;
+    font-size: 14px;
+  }
+}
 ::v-deep .crud-opts-left {
   display: none;
 }

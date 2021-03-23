@@ -251,7 +251,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="210px" fixed="right" align="center">
+        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="210px" align="center">
           <template slot-scope="scope">
             <el-button
               size="mini"

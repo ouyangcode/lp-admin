@@ -31,6 +31,11 @@ import './assets/icons' // icon
 import './router/index' // permission control
 import 'echarts-gl'
 
+// 引入 vant的 移动端日历控件
+import { Calendar } from 'vant'
+import 'vant/lib/calendar/style'
+Vue.use(Calendar)
+
 Vue.use(checkPer)
 Vue.use(VueHighlightJS)
 Vue.use(mavonEditor)

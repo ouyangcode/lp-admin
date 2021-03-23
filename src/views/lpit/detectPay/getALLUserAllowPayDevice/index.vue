@@ -8,7 +8,7 @@
           v-model="query.gameCode"
           clearable
           placeholder="游戏"
-          style="width: 120px"
+          style="width: 100px"
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
         />
@@ -28,8 +28,9 @@
           class="filter-item"
           @keyup.enter.native="crud.toQuery"
         />
-        <rrOperation />
+
       </div>
+      <rrOperation />
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <el-dialog

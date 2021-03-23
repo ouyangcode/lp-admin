@@ -12,7 +12,7 @@
             v-model="query.gameCode"
             clearable
             placeholder="游戏"
-            style="width: 120px"
+            style="width: 100px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -24,18 +24,19 @@
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
-          <rrOperation />
         </div>
+        <rrOperation />
+        <el-button
+          v-if="crud.optShow.download"
+          :loading="crud.downloadLoading"
+          class="filter-item poasin"
+          size="mini"
+          type="warning"
+          icon="el-icon-download"
+          @click="addIosPro()"
+        >新增</el-button>
       </div>
-      <el-button
-        v-if="crud.optShow.download"
-        :loading="crud.downloadLoading"
-        class="filter-item poasin"
-        size="mini"
-        type="warning"
-        icon="el-icon-download"
-        @click="addIosPro()"
-      >新增</el-button>
+
       <crudOperation :permission="permission" />
       <el-dialog
         :visible.sync="isShowDelg"
