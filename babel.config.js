@@ -1,4 +1,8 @@
-const plugins = ['@vue/babel-plugin-transform-vue-jsx']
+const plugins = ['@vue/babel-plugin-transform-vue-jsx', ['import', {
+  libraryName: 'vant',
+  libraryDirectory: 'es',
+  style: true
+}, 'vant']]
 // 生产环境移除console
 if (process.env.NODE_ENV === 'production') {
   plugins.push('transform-remove-console')
@@ -10,12 +14,12 @@ module.exports = {
   ]
 }
 
-module.exports = {
-  plugins: [
-    ['import', {
-      libraryName: 'vant',
-      libraryDirectory: 'es',
-      style: true
-    }, 'vant']
-  ]
-}
+// module.exports = {
+//   plugins: [
+//     ['import', {
+//       libraryName: 'vant',
+//       libraryDirectory: 'es',
+//       style: true
+//     }, 'vant']
+//   ]
+// }
