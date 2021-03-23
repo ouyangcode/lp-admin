@@ -37,6 +37,7 @@
               clearable
               placeholder="开始时间"
               class="filter-item inp_enll"
+              @focus="hiddenCode"
               @click="hovePick"
             >
             <span>:</span>
@@ -46,6 +47,7 @@
               placeholder="结束时间"
               class="filter-item"
               @click="hovePick"
+              @focus="hiddenCode"
             >
             <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
           </div>
@@ -269,6 +271,9 @@ export default {
         /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
       )
       return flag
+    },
+    hiddenCode() {
+      document.activeElement.blur()
     }
   }
 }

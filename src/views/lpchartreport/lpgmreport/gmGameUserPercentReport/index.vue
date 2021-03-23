@@ -27,7 +27,7 @@
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column prop="gameName" align="center" label="游戏">
           <template slot-scope="scope">
             <p>{{ scope.row.gameName }}</p>
@@ -104,7 +104,8 @@ export default {
         { currency: 'TWD', value: 'TWD' }
       ],
       getSelectData: '',
-      getSeleCurrctData: ''
+      getSeleCurrctData: '',
+      tableHeight: 100
     }
   },
   created() {
@@ -114,6 +115,17 @@ export default {
       del: false,
       download: true
     }
+  },
+  mounted: function() {
+    this.$nextTick(function() {
+      this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50
+
+      // 监听窗口大小变化
+      const self = this
+      window.onresize = function() {
+        self.tableHeight = window.innerHeight - self.$refs.table.$el.offsetTop - 50
+      }
+    })
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
