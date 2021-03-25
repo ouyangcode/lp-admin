@@ -10,18 +10,24 @@
           size="small"
           placeholder="渠道"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
-            v-for="item in crud.data.gameCodeList"
+            v-for="item in crud.data.channelList"
             :key="item.key"
             :label="item.channelName"
             :value="item.channelCode"
           />
         </el-select>
 
-        <van-calendar v-model="isVisible" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
+        <van-calendar
+          v-model="isVisible"
+          :min-date="minDate"
+          :max-date="maxDate"
+          type="range"
+          @confirm="onConfirm"
+        />
         <template v-if="!isShowTime">
           <div class="changDate">
             <input
@@ -41,18 +47,33 @@
               @click="hovePick"
               @focus="hiddenCode"
             >
-            <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
+            <i
+              v-if="isHidd"
+              class="el-icon-circle-close closeInp"
+              @click="delInp"
+            />
           </div>
         </template>
-        <date-range-picker v-if="isShowTime" v-model="query.sdate" class="date-item" />
-
+        <date-range-picker
+          v-if="isShowTime"
+          v-model="query.sdate"
+          class="date-item"
+        />
       </div>
       <rrOperation />
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small">
+      <el-table
+        ref="table"
+        v-loading="crud.loading"
+        :height="tableHeight"
+        :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
+        border
+        :data="crud.data"
+        size="small"
+      >
         <el-table-column prop="channel" align="center" label="channel" />
         <el-table-column prop="dateList" align="center" label="时间">
           <template slot-scope="scope">
@@ -67,11 +88,7 @@
         </el-table-column>
         <el-table-column prop="point" align="center" label="point">
           <template slot-scope="scope">
-            <div
-              v-for="item of scope.row.point"
-              :key="item.key"
-              class="open"
-            >
+            <div v-for="item of scope.row.point" :key="item.key" class="open">
               {{ item }}
             </div>
           </template>
@@ -84,7 +101,11 @@
 </template>
 
 <script>
-import { lpGmPayChannelDayReport, download, todownForPage } from '@/api/lpmain/gmPayChannelDayReport'
+import {
+  lpGmPayChannelDayReport,
+  download,
+  todownForPage
+} from '@/api/lpmain/gmPayChannelDayReport'
 import { downloadFile, parseTimes } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
@@ -97,16 +118,17 @@ export default {
   components: { rrOperation, DateRangePicker, crudOperation, pagination },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'soho測試生成', url: 'api/gmPayChannelDayReport/reportList', crudMethod: { ...lpGmPayChannelDayReport }})
+    return CRUD({
+      title: 'soho測試生成',
+      url: 'api/gmPayChannelDayReport/reportList',
+      crudMethod: { ...lpGmPayChannelDayReport }
+    })
   },
   data() {
     return {
-      permission: { },
-      rules: {
-      },
-      queryTypeOptions: [
-        { key: 'gameCode', display_name: '游戏代码' }
-      ],
+      permission: {},
+      rules: {},
+      queryTypeOptions: [{ key: 'gameCode', display_name: '游戏代码' }],
       getDateValue: '',
       isShow: false,
       gameOptions: [],
@@ -121,7 +143,8 @@ export default {
       startrtime: '',
       endrtime: '',
       minDate: new Date(2012, 1, 1),
-      maxDate: new Date(2030, 1, 31)
+      maxDate: new Date(2030, 1, 31),
+      scroll: null
     }
   },
   created() {
@@ -136,15 +159,20 @@ export default {
     }
   },
   mounted: function() {
-    this.$nextTick(function() {
-      this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50
+    window.addEventListener('scroll', this.scrollTop)
+    if (this.isMobile() && (window.innerWidth < 486)) {
+      this.$nextTick(function() {
+        this.tableHeight =
+          window.innerHeight - this.$refs.table.$el.offsetTop + 200
 
-      // 监听窗口大小变化
-      const self = this
-      window.onresize = function() {
-        self.tableHeight = window.innerHeight - self.$refs.table.$el.offsetTop - 50
-      }
-    })
+        // 监听窗口大小变化
+        const self = this
+        window.onresize = function() {
+          self.tableHeight =
+            window.innerHeight - self.$refs.table.$el.offsetTop + 200
+        }
+      })
+    }
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
@@ -167,11 +195,11 @@ export default {
       this.getSelectData = data
     },
     saveFile(userpay) {
-      todownForPage().then(res => {
+      todownForPage().then((res) => {
         if (res.state === 1) {
           var data = userpay.LostPayUser
           this.arrToString = data.join('\n')
-          var name = '下載流失的儲值用戶平臺id.txt'// 文件名
+          var name = '下載流失的儲值用戶平臺id.txt' // 文件名
           this.exportRaw(this.arrToString, name)
         }
       })
@@ -179,7 +207,10 @@ export default {
     exportRaw(data, name) {
       var urlObject = window.URL || window.webkitURL || window
       var export_blob = new Blob([data])
-      var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a')
+      var save_link = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'a'
+      )
       save_link.href = urlObject.createObjectURL(export_blob)
       save_link.download = name
       save_link.click()
@@ -209,6 +240,16 @@ export default {
     },
     hiddenCode() {
       document.activeElement.blur()
+    },
+    scrollTop() {
+      this.scroll = document.documentElement.scrollTop || document.body.scrollTop
+      this.$nextTick(function() {
+        if (this.scroll >= this.$refs.table.$el.offsetTop) {
+          console.log('翠花')
+          console.log(this.crud.props.searchToggle)
+          this.crud.props.searchToggle = !this.crud.props.searchToggle
+        }
+      })
     }
   }
 }
@@ -216,16 +257,16 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped >
 .changDate {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  margin-bottom: 10px;
-  height: 30.5px !important;
-  width: 230px !important;
-  border: 1px solid #dcdfe6;
-  background-color: #fff;
-  border-radius: 4px;
-  padding: 0 15px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    height: 30.5px!important;
+    width: 199px!important;
+    border: 1px solid #dcdfe6;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 0px 14px;
   box-sizing: border-box;
   span {
     margin: 0 10px;
@@ -240,27 +281,26 @@ export default {
     height: 100%;
     margin: 0;
     padding: 0;
-    width: 39%;
+    width: 40%;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     color: #606266;
   }
   .closeInp {
     position: absolute;
-    top: 0.5rem;
-    right: 0.35rem;
+    top: 8px;
+    right: 6px;
     font-size: 14px;
+    z-index: 10;
   }
 }
 ::v-deep .crud-opts-left {
   display: none;
 }
 .open {
-
   border-bottom: 1px solid #dfe6ec;
   &:last-child {
     border-bottom: none;
   }
 }
-
 </style>

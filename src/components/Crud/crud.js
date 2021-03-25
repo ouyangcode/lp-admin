@@ -37,6 +37,7 @@ function CRUD(options) {
     fillterData: [],
     spoeData: [],
     gameCodeList: [],
+    channelList: [],
     // 选择项
     selections: [],
     // 待查询的对象
@@ -173,14 +174,15 @@ function CRUD(options) {
           }
           var toExep = /^\/api\/detectThirdPartyPayOpen\//
           if (crud.url === 'api/gmPayGameYearReport/reportList') {
-            var values = Object.values(data.content[0])
-            var keys = Object.keys(data.content[0])
+            console.log(data.rst.rstMap)
+            var values = Object.values(data.rst.rstMap)
+            var keys = Object.keys(data.rst.rstMap)
             values.forEach((item, index) => {
               item.gameCode = keys[index]
             })
 
-            for (var key in data.content[0]) {
-              var value = data.content[0][key]
+            for (var key in data.rst.rstMap) {
+              var value = data.rst.rstMap[key]
               yearArray.forEach((res, keys) => {
                 var yvalue = value[yearArray[keys]]
                 if (yvalue != null && yvalue !== undefined) {
@@ -255,6 +257,7 @@ function CRUD(options) {
           } else {
             crud.data = data.content
             crud.data.gameCodeList = data.gameCodeList
+            crud.data.channelList = data.channelList
             console.log(crud.data)
           }
           crud.resetDataStatus()

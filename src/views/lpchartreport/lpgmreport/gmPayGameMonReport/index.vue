@@ -10,7 +10,7 @@
           size="small"
           placeholder="游戏"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
@@ -50,14 +50,13 @@
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column prop="gameName" align="center" label="游戏">
           <template slot-scope="scope">
             <p>{{ scope.row.gameName }}</p>
             <p>{{ scope.row.gameCode }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="currType" align="center" label="币种" />
         <el-table-column prop="dateList" align="center" label="日期">
           <template slot-scope="scope">
             <div
@@ -80,6 +79,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="currType" align="center" label="币种" />
       </el-table>
       <!--分页组件-->
       <pagination />
@@ -116,7 +116,8 @@ export default {
         { currency: 'TWD', value: 'TWD' }
       ],
       getSelectData: '',
-      getSeleCurrctData: ''
+      getSeleCurrctData: '',
+      tableHeight: null
     }
   },
   created() {
@@ -125,6 +126,21 @@ export default {
       edit: false,
       del: false,
       download: true
+    }
+  },
+  mounted: function() {
+    if (this.isMobile() && (window.innerWidth < 486)) {
+      this.$nextTick(function() {
+        this.tableHeight =
+          window.innerHeight - this.$refs.table.$el.offsetTop + 50
+
+        // 监听窗口大小变化
+        const self = this
+        window.onresize = function() {
+          self.tableHeight =
+            window.innerHeight - self.$refs.table.$el.offsetTop + 50
+        }
+      })
     }
   },
   methods: {
@@ -144,6 +160,12 @@ export default {
         .catch(() => {
           this.crud.downloadLoading = false
         })
+    },
+    isMobile() {
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+      return flag
     },
     selectData(data) {
       this.getSelectData = data

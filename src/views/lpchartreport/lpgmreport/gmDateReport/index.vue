@@ -10,7 +10,7 @@
           size="small"
           placeholder="游戏"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
@@ -61,7 +61,7 @@
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column prop="gameName" align="center" fixed label="游戏名">
           <template slot-scope="scope">
             <p>{{ scope.row.gameName }}</p>
@@ -321,7 +321,8 @@ export default {
       startrtime: '',
       endrtime: '',
       minDate: new Date(2012, 1, 1),
-      maxDate: new Date(2030, 1, 31)
+      maxDate: new Date(2030, 1, 31),
+      tableHeight: null
     }
   },
   created() {
@@ -333,6 +334,21 @@ export default {
     }
     if (this.isMobile()) {
       this.isShowTime = false
+    }
+  },
+  mounted: function() {
+    if (this.isMobile() && (window.innerWidth < 486)) {
+      this.$nextTick(function() {
+        this.tableHeight =
+          window.innerHeight - this.$refs.table.$el.offsetTop + 50
+
+        // 监听窗口大小变化
+        const self = this
+        window.onresize = function() {
+          self.tableHeight =
+            window.innerHeight - self.$refs.table.$el.offsetTop + 50
+        }
+      })
     }
   },
   methods: {
@@ -387,16 +403,16 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped >
 .changDate {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  margin-bottom: 10px;
-  height: 30.5px !important;
-  width: 230px !important;
-  border: 1px solid #dcdfe6;
-  background-color: #fff;
-  border-radius: 4px;
-  padding: 0 15px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    height: 30.5px!important;
+    width: 199px!important;
+    border: 1px solid #dcdfe6;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 0px 14px;
   box-sizing: border-box;
   span {
     margin: 0 10px;
@@ -411,16 +427,17 @@ export default {
     height: 100%;
     margin: 0;
     padding: 0;
-    width: 39%;
+    width: 40%;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     color: #606266;
   }
   .closeInp {
     position: absolute;
-    top: 0.5rem;
-    right: 0.35rem;
+    top: 8px;
+    right: 6px;
     font-size: 14px;
+    z-index: 10;
   }
 }
 ::v-deep .crud-opts-left {

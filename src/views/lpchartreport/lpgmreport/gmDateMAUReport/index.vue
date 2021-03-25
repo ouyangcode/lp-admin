@@ -11,7 +11,7 @@
           size="small"
           placeholder="游戏"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
@@ -35,7 +35,7 @@
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column prop="daS" align="center" label="日期" />
         <el-table-column prop="allTotalCountList" align="center" label="all" width="200px" />
         <el-table-column prop="iosTotalCountList" align="center" label="ios" />
@@ -79,7 +79,8 @@ export default {
       gameOptions: [],
       gameData: [],
       arrToString: [],
-      getSelectData: ''
+      getSelectData: '',
+      tableHeight: null
     }
   },
   created() {
@@ -88,6 +89,21 @@ export default {
       edit: false,
       del: false,
       download: true
+    }
+  },
+  mounted: function() {
+    if (this.isMobile() && (window.innerWidth < 486)) {
+      this.$nextTick(function() {
+        this.tableHeight =
+          window.innerHeight - this.$refs.table.$el.offsetTop + 50
+
+        // 监听窗口大小变化
+        const self = this
+        window.onresize = function() {
+          self.tableHeight =
+            window.innerHeight - self.$refs.table.$el.offsetTop + 50
+        }
+      })
     }
   },
   methods: {
@@ -127,6 +143,12 @@ export default {
       save_link.href = urlObject.createObjectURL(export_blob)
       save_link.download = name
       save_link.click()
+    },
+    isMobile() {
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+      return flag
     }
   }
 }

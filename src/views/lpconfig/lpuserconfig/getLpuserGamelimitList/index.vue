@@ -192,7 +192,9 @@ export default {
       ],
       curdHook: '',
       checkedCities: [],
-      allgameTitle: 'allgame'
+      changeArr: [],
+      allgameTitle: 'allgame',
+      getdata: null
     }
   },
   methods: {
@@ -204,13 +206,13 @@ export default {
       for (var key in this.scopeData) {
         this.scopeData[key] = null
       }
+
       this.checkedCities = []
       this.scopeData.gamecode = ''
       this.isShowDelg = !this.isShowDelg
       this.curdHook = 'add'
     },
     editGameServerInfo(data) {
-      console.log(data)
       if (!data.gamecode) {
         data.gamecode = ''
       }
@@ -221,7 +223,7 @@ export default {
           getSplitArr.push(item.gameCode)
         }
       })
-      console.log(getSplitArr)
+      this.getdata = JSON.stringify(data)
       this.checkedCities = getSplitArr
       this.isShowDelg = !this.isShowDelg
       this.scopeData = data
@@ -259,6 +261,7 @@ export default {
 
           break
         case 'edit':
+          this.scopeData.gamecode = this.changeArr
           this.scopeData.modifytime = parseTime(new Date())
           edit(this.scopeData).then((res) => {
             this.crud.editSuccessNotify()
@@ -274,11 +277,10 @@ export default {
       }
     },
     closeTip() {
-      this.isShowDelg = !this.isShowDelg
-      for (var key in this.scopeData) {
-        this.scopeData[key] = null
+      for (var keys in this.scopeData) {
+        this.scopeData[keys] = JSON.parse(this.getdata)[keys]
       }
-      this.crud.refresh()
+      this.isShowDelg = !this.isShowDelg
     },
     handleCheckedCitiesChange(value) {
       console.log(value)
@@ -288,8 +290,7 @@ export default {
           value = ['allgame']
         }
       })
-      this.scopeData.gamecode = value.join(',')
-      console.log(this.scopeData.gamecode)
+      this.changeArr = value.join(',')
     },
     checkData(value) {
       if (value) {

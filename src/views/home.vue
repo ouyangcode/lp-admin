@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-editor-container">
-      <github-corner class="github-corner" />
 
       <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
@@ -30,7 +29,7 @@
 </template>
 
 <script>
-import GithubCorner from '@/components/GithubCorner'
+// import GithubCorner from '@/components/GithubCorner'
 import PanelGroup from './dashboard/PanelGroup'
 import LineChart from './dashboard/LineChart'
 import RadarChart from '@/components/Echarts/RadarChart'
@@ -59,7 +58,6 @@ const lineChartData = {
 export default {
   name: 'Dashboard',
   components: {
-    GithubCorner,
     PanelGroup,
     LineChart,
     RadarChart,

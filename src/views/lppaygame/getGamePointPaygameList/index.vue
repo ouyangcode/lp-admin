@@ -312,7 +312,7 @@ export default {
     return CRUD({
       title: '用户兑换流水',
       url: '/api/lpGamePointPaygame/getGamePointPaygameList',
-      sort: 'gmid',
+      sort: 'gmid,desc',
       crudMethod: { ...GetGamePointPaygameList }
     })
   },

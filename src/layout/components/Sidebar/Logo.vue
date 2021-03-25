@@ -14,7 +14,7 @@
 </template>
 
 <script>
-// import Logo from '@/assets/images/logo.png'
+import Logo from '@/assets/images/logo.png'
 export default {
   name: 'SidebarLogo',
   props: {
@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       title: 'LP-后台管理',
-      logo: ''
+      logo: Logo
     }
   }
 }
@@ -64,7 +64,7 @@ export default {
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color: #fff;
+      color: #000;
       font-weight: 600;
       line-height: 50px;
       font-size: 14px;

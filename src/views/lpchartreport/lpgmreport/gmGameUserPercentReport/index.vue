@@ -10,7 +10,7 @@
           size="small"
           placeholder="游戏"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
@@ -28,14 +28,14 @@
 
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :height="tableHeight" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
-        <el-table-column prop="gameName" align="center" label="游戏">
+        <el-table-column prop="gameName" align="center" label="游戏" fixed width="120px">
           <template slot-scope="scope">
             <p>{{ scope.row.gameName }}</p>
             <p>{{ scope.row.gameCode }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="toatalNum" align="center" label="总平台用户" />
-        <el-table-column prop="dataList" align="center" label="来源">
+        <el-table-column prop="toatalNum" align="center" label="总平台用户" width="110px" />
+        <el-table-column prop="dataList" align="center" label="来源" min-width="150px">
           <template slot-scope="scope">
             <div
               v-for="item of Object.keys(scope.row.dataList)"
@@ -46,7 +46,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="num" align="center" label="平台用户">
+        <el-table-column prop="num" align="center" label="平台用户" min-width="120px">
           <template slot-scope="scope">
             <div
               v-for="item of scope.row.dataList"
@@ -57,7 +57,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="percent" align="center" label="占比">
+        <el-table-column prop="percent" align="center" label="占比" min-width="120px">
           <template slot-scope="scope">
             <div
               v-for="item of scope.row.dataList"
@@ -105,7 +105,7 @@ export default {
       ],
       getSelectData: '',
       getSeleCurrctData: '',
-      tableHeight: 100
+      tableHeight: null
     }
   },
   created() {
@@ -117,15 +117,19 @@ export default {
     }
   },
   mounted: function() {
-    this.$nextTick(function() {
-      this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50
+    if (this.isMobile() && (window.innerWidth < 486)) {
+      this.$nextTick(function() {
+        this.tableHeight =
+          window.innerHeight - this.$refs.table.$el.offsetTop + 50
 
-      // 监听窗口大小变化
-      const self = this
-      window.onresize = function() {
-        self.tableHeight = window.innerHeight - self.$refs.table.$el.offsetTop - 50
-      }
-    })
+        // 监听窗口大小变化
+        const self = this
+        window.onresize = function() {
+          self.tableHeight =
+            window.innerHeight - self.$refs.table.$el.offsetTop + 50
+        }
+      })
+    }
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
@@ -144,6 +148,12 @@ export default {
         .catch(() => {
           this.crud.downloadLoading = false
         })
+    },
+    isMobile() {
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+      return flag
     },
     selectData(data) {
       this.getSelectData = data

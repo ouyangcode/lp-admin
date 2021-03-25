@@ -5,12 +5,11 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-select
-          v-model="query.currType"
-          clearable
+          v-model="getSelectData"
           size="small"
           placeholder="币种"
           class="filter-item"
-          style="width: 120px"
+          style="width: 100px"
           @change="selectData"
         >
           <el-option
@@ -20,21 +19,13 @@
             :value="item.currency"
           />
         </el-select>
-        <el-date-picker
-          v-model="query.sdate"
-          class="date-item"
-          value-format="yyyy"
-          type="year"
-          placeholder="选择年"
-        />
-
       </div>
       <rrOperation />
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
 
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
+      <el-table ref="table" v-loading="crud.loading" show-summary sum-text="总金额" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column prop="gameCode" align="center" label="gameCode" />
         <el-table-column prop="2012" align="center" label="2012" />
         <el-table-column prop="2013" align="center" label="2013" />
@@ -47,7 +38,7 @@
         <el-table-column prop="2020" align="center" label="2020" />
         <el-table-column prop="2021" align="center" label="2021" />
       </el-table>
-      <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.fillterData" size="small" style="width: 100%;">
+      <!-- <el-table ref="table" v-loading="crud.loading" :header-cell-style="{background:'#eef1f6',color:'#606266'}" border :data="crud.fillterData" size="small" style="width: 100%;">
         <el-table-column prop="totalPoint" align="center" label="总金额" />
         <el-table-column prop="2012" align="center" label="2012" />
         <el-table-column prop="2013" align="center" label="2013" />
@@ -59,7 +50,7 @@
         <el-table-column prop="2019" align="center" label="2019" />
         <el-table-column prop="2020" align="center" label="2020" />
         <el-table-column prop="2021" align="center" label="2021" />
-      </el-table>
+      </el-table> -->
       <!--分页组件-->
       <pagination />
     </div>
@@ -96,7 +87,8 @@ export default {
         { currency: 'TWD', value: 'TWD' }
       ],
       getSelectData: '',
-      getSeleCurrctData: ''
+      getSeleCurrctData: '',
+      tableHeight: null
     }
   },
   created() {
@@ -106,6 +98,7 @@ export default {
       del: false,
       download: true
     }
+    this.getSelectData = 'TWD'
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
@@ -126,10 +119,21 @@ export default {
         })
     },
     selectData(data) {
+      console.log(data)
       this.getSelectData = data
+      this.query.currType = data
     },
     selectCurrData(data) {
       this.getSeleCurrctData = data
+    },
+    getSummaries(params) {
+      console.log(params)
+    },
+    isMobile() {
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+      return flag
     }
   }
 }
