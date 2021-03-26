@@ -23,5 +23,14 @@ export function edit(data) {
     data
   })
 }
+export function gameRoomCleanCache(gamecode) {
+  return request({
+    url: '/api/lpgameroom/gameRoomCleanCache',
+    method: 'get',
+    params: {
+      gamecode
+    }
+  })
+}
 
-export default { add, edit, del }
+export default { add, edit, del, gameRoomCleanCache }

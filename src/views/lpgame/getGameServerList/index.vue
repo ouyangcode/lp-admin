@@ -194,6 +194,33 @@
       >
         <el-table-column v-if="isShow" align="center" prop="gsid" label="gsid" width="60px" />
         <el-table-column align="center" prop="index" label="序号" width="60px" />
+        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="90px" align="center">
+          <template slot-scope="scope">
+            <el-popover placement="bottom-end" popper-class="chProo" trigger="click">
+              <el-button slot="reference" size="mini" icon="el-icon-setting">
+                <i class="fa fa-caret-down" aria-hidden="true" />
+              </el-button>
+              <div class="dise">
+                <div class="edit">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="editGameServerInfo(scope.row)"
+                  >编辑</el-button>
+                </div>
+
+                <el-button
+                  size="mini"
+                  type="success"
+                  icon="el-icon-refresh"
+                  @click="uploadGameInfo(scope.row)"
+                >更新缓存</el-button>
+              </div>
+
+            </el-popover>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="gamecode" label="游戏代码" />
         <el-table-column align="center" prop="servername" label="服务器名" />
         <el-table-column align="center" prop="servercode" label="服务器编码" width="120px" />
@@ -265,17 +292,6 @@
             </div>
           </template>
         </el-table-column>
-
-        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="100px" fixed="right" align="center">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="primary"
-              icon="el-icon-edit"
-              @click="editGameServerInfo(scope.row)"
-            >编辑</el-button>
-          </template>
-        </el-table-column>
       </el-table>
       <!--分页组件-->
       <pagination />
@@ -284,7 +300,7 @@
 </template>
 
 <script>
-import { crudGetGameServerList, add, edit, del, getAllGameCode } from '@/api/lpgame/getGameServerList'
+import { crudGetGameServerList, add, edit, del, getAllGameCode, gameServerCleanCache } from '@/api/lpgame/getGameServerList'
 import { parseTime } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
@@ -441,17 +457,62 @@ export default {
       }
       this.crud.refresh()
     },
+    uploadGameInfo(data) {
+      gameServerCleanCache(data.servercode).then((res) => {
+        if (res.rst === 1) {
+          this.$message({
+            message: '更新成功',
+            type: 'success'
+          })
+        } else if (res.rst === 0) {
+          this.$message({
+            message: '参数不能为空',
+            type: 'danger'
+          })
+        }
+      })
+    },
     handlePreview() {},
     handleRemove() {}
   }
 }
 </script>
 
+<style lang="scss">
+  .el-popover.chProo{
+ position: absolute;
+  left: 236px !important;
+  background: #fff;
+  min-width: 100px;
+  border-radius: 4px;
+  border: 1px solid #e6ebf5;
+  padding: 12px;
+  z-index: 2000;
+  color: #606266;
+  line-height: 1.4;
+  text-align: justify;
+  font-size: 14px;
+  -webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  word-break: break-all;
+  .popper__arrow {
+    left: 78px !important;
+  }
+}
+</style>
+
 <style rel="stylesheet/scss" lang="scss" scoped>
+
 ::v-deep .crud-opts-left {
   display: none;
 }
-
+.dise{
+  display: flex !important;
+  flex-direction: column !important;
+  .edit{
+    margin-bottom: 10px;
+  }
+}
 .postin{
   position: absolute;
 }

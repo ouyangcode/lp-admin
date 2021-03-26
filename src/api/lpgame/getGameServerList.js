@@ -30,4 +30,14 @@ export function getAllGameCode() {
   })
 }
 
-export default { add, edit, del, getAllGameCode }
+export function gameServerCleanCache(servercode) {
+  return request({
+    url: '/api/lpgameserver/gameServerCleanCache',
+    method: 'get',
+    params: {
+      servercode
+    }
+  })
+}
+
+export default { add, edit, del, getAllGameCode, gameServerCleanCache }
