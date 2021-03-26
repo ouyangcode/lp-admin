@@ -9,7 +9,7 @@
             v-model="query.username"
             clearable
             placeholder="用户账号"
-            style="width: 150px"
+            style="width: 120px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -17,7 +17,7 @@
             v-model="query.passport"
             clearable
             placeholder="passport"
-            style="width: 200px"
+            style="width: 170px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -25,7 +25,7 @@
             v-model="query.siteUsername"
             clearable
             placeholder="第三方用户id"
-            style="width: 150px"
+            style="width: 140px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -41,7 +41,7 @@
             v-model="query.email"
             clearable
             placeholder="email"
-            style="width: 200px"
+            style="width: 170px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -92,9 +92,11 @@
               :value="item.id"
             />
           </el-select>
+          <rrOperation />
         </div>
+
       </div>
-      <rrOperation />
+
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
@@ -182,18 +184,18 @@
         size="small"
         style="width: 100%"
       >
-        <el-table-column align="center" prop="id" label="id" />
-        <el-table-column align="center" prop="username" label="用户账号" />
-        <el-table-column align="center" prop="passport" label="passport" />
+        <el-table-column align="center" prop="index" label="序号" width="60px" />
+        <el-table-column align="center" prop="username" label="用户账号" width="140px" />
+        <el-table-column align="center" prop="passport" label="passport" width="155px" />
         <el-table-column
           align="center"
           prop="siteUsername"
           label="第三方用户id"
-          width="120px"
+          width="165px"
         />
-        <el-table-column align="center" prop="sitecode" label="来源" />
-        <el-table-column align="center" prop="email" label="邮箱" />
-        <el-table-column align="center" prop="regip" label="ip地址" />
+        <el-table-column align="center" prop="sitecode" label="来源" width="110px" />
+        <el-table-column align="center" prop="email" label="邮箱" width="180px" />
+        <el-table-column align="center" prop="regip" label="ip地址" width="130px" />
         <el-table-column align="center" prop="isupgrade" label="是否升级">
           <template slot-scope="scope">
             <div v-if="scope.row.isupgrade === 1">
@@ -225,8 +227,8 @@
         <el-table-column align="center" prop="birthday" label="生日" />
         <el-table-column align="center" prop="identityCard" label="身份证" />
         <el-table-column align="center" prop="telephone" label="电话" />
-        <el-table-column align="center" prop="password" label="密码" />
-        <el-table-column align="center" prop="userkey" label="userkey" />
+        <el-table-column v-if="isShow" align="center" prop="password" label="密码" />
+        <el-table-column v-if="isShow" align="center" prop="userkey" label="userkey" />
 
         <el-table-column
           v-if="checkPer(['admin', 'gameUser:edit', 'gameUser:del'])"

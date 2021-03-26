@@ -58,15 +58,7 @@
             v-model="query.passport"
             clearable
             placeholder="passport"
-            style="width: 180px"
-            class="filter-item"
-            @keyup.enter.native="crud.toQuery"
-          />
-          <el-input
-            v-model="query.orderId"
-            clearable
-            placeholder="订单号"
-            style="width: 220px"
+            style="width: 170px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -74,6 +66,14 @@
             v-model="query.packageName"
             clearable
             placeholder="包名"
+            style="width: 175px"
+            class="filter-item"
+            @keyup.enter.native="crud.toQuery"
+          />
+          <el-input
+            v-model="query.orderId"
+            clearable
+            placeholder="订单号"
             style="width: 180px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
@@ -82,7 +82,7 @@
             v-model="query.roleid"
             clearable
             placeholder="roleid"
-            style="width: 120px"
+            style="width: 110px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
@@ -180,7 +180,12 @@
         @selection-change="crud.selectionChangeHandler"
       >
 
-        <el-table-column align="center" prop="gmid" label="序号" width="65px" />
+        <el-table-column
+          align="center"
+          prop="index"
+          label="序号"
+          width="85px"
+        />
         <el-table-column
           align="center"
           prop="status"

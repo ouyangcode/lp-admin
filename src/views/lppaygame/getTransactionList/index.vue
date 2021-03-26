@@ -57,8 +57,9 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
         />
+        <rrOperation />
       </div>
-      <rrOperation />
+
       <crudOperation :permission="permission" />
       <!--表格渲染-->
       <el-table
@@ -70,7 +71,12 @@
         style="width: 100%"
         border
       >
-        <el-table-column align="center" prop="tid" label="序号" width="65px" />
+        <el-table-column
+          align="center"
+          prop="index"
+          label="序号"
+          width="85px"
+        />
         <el-table-column
           align="center"
           prop="channel"

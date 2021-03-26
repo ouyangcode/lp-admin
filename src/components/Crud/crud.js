@@ -38,6 +38,7 @@ function CRUD(options) {
     spoeData: [],
     gameCodeList: [],
     channelList: [],
+    sortId: null,
     // 选择项
     selections: [],
     // 待查询的对象
@@ -255,6 +256,10 @@ function CRUD(options) {
             data.gameCodeList.unshift(shiftData)
             crud.data.gameCodeList = data.gameCodeList
           } else {
+            data.content.forEach((item, index) => {
+              item.index = (crud.page.page - 1) * crud.page.size + index + 1
+            })
+            console.log(data.content.index)
             crud.data = data.content
             crud.data.gameCodeList = data.gameCodeList
             crud.data.channelList = data.channelList

@@ -4,7 +4,7 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
-        <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 140px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <el-select
           v-model="query.runstate"
           clearable
@@ -21,16 +21,17 @@
           />
         </el-select>
         <rrOperation :crud="crud" />
+        <el-button
+          v-if="crud.optShow.download"
+          :loading="crud.downloadLoading"
+          class="filter-item postin"
+          size="mini"
+          type="warning"
+          icon="el-icon-download"
+          @click="addGameInfo()"
+        >新增</el-button>
       </div>
-      <el-button
-        v-if="crud.optShow.download"
-        :loading="crud.downloadLoading"
-        class="filter-item postin"
-        size="mini"
-        type="warning"
-        icon="el-icon-download"
-        @click="addGameInfo()"
-      >新增</el-button>
+
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
@@ -191,7 +192,8 @@
         size="small"
         style="width: 100%"
       >
-        <el-table-column align="center" prop="gsid" label="gsid" width="60px" />
+        <el-table-column v-if="isShow" align="center" prop="gsid" label="gsid" width="60px" />
+        <el-table-column align="center" prop="index" label="序号" width="60px" />
         <el-table-column align="center" prop="gamecode" label="游戏代码" />
         <el-table-column align="center" prop="servername" label="服务器名" />
         <el-table-column align="center" prop="servercode" label="服务器编码" width="120px" />
@@ -300,6 +302,7 @@ export default {
   data() {
     return {
       isShowDelg: false,
+      isShow: false,
       scopeData: {
         servername: null,
         gamecode: null,

@@ -5,8 +5,9 @@
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-input v-model="query.passport" clearable placeholder="passport" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <rrOperation :crud="crud" />
       </div>
-      <rrOperation :crud="crud" />
+
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
@@ -23,13 +24,13 @@
       </el-dialog>
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
-        <el-table-column align="center" prop="id" label="id" width="60px" />
-        <el-table-column align="center" prop="passport" label="passport" />
+        <el-table-column align="center" prop="index" label="序号" width="80px" />
+        <el-table-column align="center" prop="passport" label="passport" width="155px" />
         <el-table-column align="center" prop="totalpoint" label="储值总L点" />
         <el-table-column align="center" prop="usepoint" label="使用总L点" />
-        <el-table-column align="center" prop="userkey" label="userkey" />
-        <el-table-column align="center" prop="lastChangeTime" label="最后一次更改时间" />
-        <el-table-column align="center" prop="lastChangeType" label="最后一次更改类型" />
+        <el-table-column align="center" prop="userkey" label="userkey" width="150px" />
+        <el-table-column align="center" prop="lastChangeTime" label="最后一次更改时间" width="140px" />
+        <el-table-column align="center" prop="lastChangeType" label="最后一次更改类型" width="140px" />
         <el-table-column v-if="checkPer(['admin','gameUserBase:edit','gameUserBase:del'])" align="center" label="操作" width="150px">
           <template slot-scope="scope">
             <udOperation

@@ -4,7 +4,7 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
-        <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 140px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <el-select
           v-model="query.runstate"
           clearable
@@ -21,16 +21,17 @@
           />
         </el-select>
         <rrOperation :crud="crud" />
+        <el-button
+          v-if="crud.optShow.download"
+          :loading="crud.downloadLoading"
+          class="filter-item postin"
+          size="mini"
+          type="warning"
+          icon="el-icon-download"
+          @click="addGameInfo()"
+        >新增</el-button>
       </div>
-      <el-button
-        v-if="crud.optShow.download"
-        :loading="crud.downloadLoading"
-        class="filter-item postin"
-        size="mini"
-        type="warning"
-        icon="el-icon-download"
-        @click="addGameInfo()"
-      >新增</el-button>
+
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
@@ -49,7 +50,7 @@
           label-width="150px"
         >
           <el-form-item label="排序编号">
-            <el-input v-model="scopeData.id" style="width: 80%" />
+            <el-input v-model="scopeData.index" style="width: 80%" />
           </el-form-item>
           <el-form-item label="游戏名称">
             <el-input v-model="scopeData.gamename" style="width: 80%" />
@@ -209,48 +210,8 @@
         size="small"
         style="width: 100%"
       >
-        <el-table-column align="center" prop="grid" label="grid" width="60px" />
-        <el-table-column align="center" prop="gamename" label="游戏名" />
-        <el-table-column align="center" prop="gamecode" label="游戏代码" />
-        <el-table-column align="center" prop="coinname" label="游戏币" />
-        <el-table-column align="center" prop="payepointnumber" label="兑换比例">
-          <template slot-scope="scope">
-            {{ scope.row.payepointnumber }} / {{ scope.row.payglodnumber }}
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="gtid" label="游戏类型" />
-        <el-table-column align="center" prop="opType" label="经营类型" />
-        <el-table-column align="center" prop="pic10" label="所属平台" />
-        <el-table-column align="center" prop="disable" label="展示" />
-        <el-table-column align="center" prop="runstate" label="运行状态" />
-        <el-table-column align="center" prop="addtime" label="添加时间" width="180px" />
-        <el-table-column align="center" prop="address" label="链接地址" width="300px">
-          <template slot-scope="scope">
-            <el-link :underline="false" :href="scope.row.gamecode" type="primary">官网</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.facebookurl" type="primary">fb粉丝页</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.gotogameurl" type="primary">ios下载页</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.downloadurl" type="primary">gp下载</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.gamecode" type="primary">二维码地址</el-link>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="photoaddress" label="图片地址" width="300px">
-          <template slot-scope="scope">
-            <el-link :underline="false" :href="scope.row.pic2" type="primary">星级图标</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.pic4" type="primary">icon</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.pic7" type="primary">平台推荐</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.pic8" type="primary">平台列表</el-link>
-            <span>|</span>
-            <el-link :underline="false" :href="scope.row.pic9" type="primary">平台二维码</el-link>
-          </template>
-        </el-table-column>
-
+        <el-table-column v-if="isShow" align="center" prop="grid" label="grid" width="60px" />
+        <el-table-column align="center" prop="index" label="序号" width="60px" />
         <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="210px" align="center">
           <template slot-scope="scope">
             <el-button
@@ -265,6 +226,80 @@
               icon="el-icon-edit"
               @click="delGameInfo(scope.row)"
             >删除</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="gamename" label="游戏名" width="100px" />
+        <el-table-column align="center" prop="gamecode" label="游戏代码" />
+        <el-table-column align="center" prop="coinname" label="游戏币" />
+        <el-table-column align="center" prop="payepointnumber" label="兑换比例">
+          <template slot-scope="scope">
+            {{ scope.row.payepointnumber }} / {{ scope.row.payglodnumber }}
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="gtid" label="游戏类型">
+          <template slot-scope="scope">
+            <div v-if="scope.row.gtid === 4">{{ "頁游" }}</div>
+            <div v-if="scope.row.gtid === 5">{{ "手游" }}</div>
+            <div v-if="scope.row.gtid === 6">{{ "單機" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="opType" label="经营类型">
+          <template slot-scope="scope">
+            <div v-if="scope.row.opType === 'own'">{{ "自家经营" }}</div>
+            <div v-if="scope.row.opType === 'lianyin'">{{ "联营" }}</div>
+            <div v-if="scope.row.opType === 'proxy'">{{ "代理独家经营" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="pic10" label="所属平台" width="120px">
+          <template slot-scope="scope">
+            <div v-if="scope.row.pic10 === '0'">{{ "港澳臺平臺" }}</div>
+            <div v-if="scope.row.pic10 === '1'">{{ "星馬泰平臺" }}</div>
+            <div v-if="scope.row.pic10 === '2'">{{ "港澳平臺" }}</div>
+            <div v-if="scope.row.pic10 === '3'">{{ "台灣平臺" }}</div>
+            <div v-if="scope.row.pic10 === '4'">{{ "大陸平臺" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="disable" label="展示">
+          <template slot-scope="scope">
+            <div v-if="scope.row.disable === 1">{{ "展示" }}</div>
+            <div v-if="scope.row.disable === 0">{{ "屏蔽" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="runstate" label="运行状态">
+          <template slot-scope="scope">
+            <div v-if="scope.row.runstate === 0">{{ "準備中0" }}</div>
+            <div v-if="scope.row.runstate === 1">{{ "公測1" }}</div>
+            <div v-if="scope.row.runstate === 2">{{ "封測2" }}</div>
+            <div v-if="scope.row.runstate === 3">{{ "停止運營3" }}</div>
+            <div v-if="scope.row.runstate === 4">{{ "熱門推薦4" }}</div>
+            <div v-if="scope.row.runstate === 5">{{ "熱門推薦5" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="addtime" label="添加时间" width="180px" />
+        <el-table-column align="center" prop="address" label="链接地址" width="320px">
+          <template slot-scope="scope">
+            <el-link :underline="false" :href="scope.row.gamecode" type="primary">官网</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.facebookurl" type="primary">fb粉丝页</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.gotogameurl" type="primary">ios下载页</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.downloadurl" type="primary">gp下载</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.gamecode" type="primary">二维码地址</el-link>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="photoaddress" label="图片地址" width="325px">
+          <template slot-scope="scope">
+            <el-link :underline="false" :href="scope.row.pic2" type="primary">星级图标</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.pic4" type="primary">icon</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.pic7" type="primary">平台推荐</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.pic8" type="primary">平台列表</el-link>
+            <span>|</span>
+            <el-link :underline="false" :href="scope.row.pic9" type="primary">平台二维码</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -293,7 +328,9 @@ export default {
   data() {
     return {
       isShowDelg: false,
+      isShow: false,
       scopeData: {
+        index: null,
         gamename: null,
         gamecode: null,
         coinname: null,
@@ -391,6 +428,10 @@ export default {
         this.crud.delSuccessNotify()
         this.crud.refresh()
       })
+    },
+    typeIndex(index) {
+      const vm = this // 处理分页数据的 index
+      return (vm.pageNo - 1) * vm.pageSize + index + 1
     },
     getServiceValue() {
       switch (this.curdHook) {
