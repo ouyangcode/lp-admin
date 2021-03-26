@@ -44,8 +44,8 @@
       <!--表单组件-->
       <el-dialog
         :visible.sync="isShowDelg"
-        width="1000px"
-        top="1vh"
+        width="750px"
+        top="5vh"
         height="95%"
         title="新增"
       >
@@ -160,19 +160,25 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="平台图片">
-            <el-upload
-              action="https://jsonplaceholder.typicode.com/posts/"
-              list-type="picture-card"
-              :on-success="handlePreview"
-              :on-remove="handleRemove"
-              :file-list="fileList"
-            >
-              <i class="el-icon-plus" />
-            </el-upload>
+          <el-form-item label="官网icon15*15">
+            <el-input v-model="scopeData.pic4" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="平台首页推荐图">
+            <el-input v-model="scopeData.pic7" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="平台游戏列表图(页游[51*51],手游[130*130])">
+            <el-input v-model="scopeData.pic8" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="平台手游二维码图(android和ios整合一张)">
+            <el-input v-model="scopeData.pic9" style="width: 80%" />
           </el-form-item>
           <el-form-item label="游戏描述">
-            <el-input v-model="scopeData.content" style="width: 80%" />
+            <el-input
+              v-model="scopeData.content"
+              type="textarea"
+              :rows="2"
+              style="width: 80%"
+            />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -500,11 +506,11 @@ export default {
         { runstate: '热门推荐', runstateform: 5 }
       ],
       statList: [
-        { stat: '5星', statform: '50' },
-        { stat: '4.5星', statform: '45' },
-        { stat: '4星', statform: '40' },
-        { stat: '3.5星', statform: '35' },
-        { stat: '3星', statform: '30' }
+        { stat: '5星', statform: '/images/xingxing/50.png' },
+        { stat: '4.5星', statform: '/images/xingxing/45.png' },
+        { stat: '4星', statform: '/images/xingxing/40.png' },
+        { stat: '3.5星', statform: '/images/xingxing/35.png' },
+        { stat: '3星', statform: '/images/xingxing/30.png' }
       ],
       runstateArr: [
         { label: '准备中', value: 0 },
@@ -584,6 +590,7 @@ export default {
           })
           break
         case 'edit':
+          console.log(this.scopeData)
           edit(this.scopeData)
             .then((res) => {
               this.crud.editSuccessNotify()
@@ -629,7 +636,6 @@ export default {
 <style lang="scss">
 .el-popover.chProo {
   position: absolute;
-  left: 236px !important;
   background: #fff;
   min-width: 100px;
   border-radius: 4px;
@@ -669,7 +675,7 @@ export default {
 
 ::v-deep .el-dialog__wrapper {
   .el-dialog {
-    height: 95%;
+    height: 66%;
     overflow: auto;
     .el-dialog__header {
       padding: 20px;

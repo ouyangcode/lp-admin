@@ -256,11 +256,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="paydomain" label="充值域名" />
+        <el-table-column align="center" prop="paydomain" label="充值域名" width="210px" />
         <el-table-column align="center" prop="gamedomain" label="登入域名" />
-        <el-table-column align="center" prop="loginKey" label="登录加密串" />
-        <el-table-column align="center" prop="payKey" label="登录加密串" />
-        <el-table-column align="center" prop="infoKey" label="获取角色加密串" />
+        <el-table-column align="center" prop="loginKey" label="登录加密串" width="160px" />
+        <el-table-column align="center" prop="payKey" label="登录加密串" width="160px" />
+        <el-table-column align="center" prop="infoKey" label="获取角色加密串" width="160px" />
         <el-table-column align="center" prop="serversgin" label="所属地区" />
         <el-table-column align="center" prop="serverrcommend" label="是否推荐">
           <template slot-scope="scope">
@@ -354,11 +354,11 @@ export default {
         { runstate: '热门推荐', runstateform: 5 }
       ],
       statList: [
-        { stat: '5星', statform: '50' },
-        { stat: '4.5星', statform: '45' },
-        { stat: '4星', statform: '40' },
-        { stat: '3.5星', statform: '35' },
-        { stat: '3星', statform: '30' }
+        { stat: '5星', statform: '/images/xingxing/50.png' },
+        { stat: '4.5星', statform: '/images/xingxing/45.png' },
+        { stat: '4星', statform: '/images/xingxing/40.png' },
+        { stat: '3.5星', statform: '/images/xingxing/35.png' },
+        { stat: '3星', statform: '/images/xingxing/30.png' }
       ],
       runstateArr: [
         { label: '正常运营', value: '4' },
@@ -481,7 +481,6 @@ export default {
 <style lang="scss">
   .el-popover.chProo{
  position: absolute;
-  left: 236px !important;
   background: #fff;
   min-width: 100px;
   border-radius: 4px;
