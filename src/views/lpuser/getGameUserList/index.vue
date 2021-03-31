@@ -101,90 +101,97 @@
       <crudOperation :permission="permission" />
       <!--表单组件-->
       <el-dialog
-        :close-on-click-modal="false"
-        :before-close="crud.cancelCU"
-        :visible.sync="isShow"
-        :title="crud.status.title"
-        width="500px"
+        :visible.sync="isShowDelg"
+        width="450px"
+        top="25vh"
+        height="30%"
+        :title="delogTitle"
+        :before-close="beforClose"
       >
         <el-form
           ref="form"
-          :model="form"
+          :model="scopeData"
           :rules="rules"
           size="small"
-          label-width="80px"
+          label-width="150px"
         >
-          <el-form-item label="username" prop="username">
-            <el-input v-model="form.username" style="width: 370px" />
+          <el-form-item label="用户passport">
+            <el-input v-model="scopeData.passport" disabled style="width: 80%" />
           </el-form-item>
-          <el-form-item label="password">
-            <el-input v-model="form.password" style="width: 370px" />
+          <el-form-item label="验证密钥">
+            <el-input
+              v-model="scopeData.vercodeKey"
+              style="width: 80%"
+            />
           </el-form-item>
-          <el-form-item label="regdate">
-            <el-input v-model="form.regdate" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="disabled">
-            <el-input v-model="form.disabled" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="regip">
-            <el-input v-model="form.regip" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="id">
-            <el-input v-model="form.id" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="userkey">
-            <el-input v-model="form.userkey" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="sitecode" prop="sitecode">
-            <el-input v-model="form.sitecode" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="siteUsername" prop="siteUsername">
-            <el-input v-model="form.siteUsername" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="passport" prop="passport">
-            <el-input v-model="form.passport" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="email">
-            <el-input v-model="form.email" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="reallyName">
-            <el-input v-model="form.reallyName" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="sex">
-            <el-input v-model="form.sex" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="birthday">
-            <el-input v-model="form.birthday" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="identityCard">
-            <el-input v-model="form.identityCard" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="telephone">
-            <el-input v-model="form.telephone" style="width: 370px" />
-          </el-form-item>
-          <el-form-item label="isupgrade">
-            <el-input v-model="form.isupgrade" style="width: 370px" />
+          <el-form-item v-if="isHidden" label="用户Email">
+            <el-input
+              v-model="scopeData.email"
+              style="width: 80%"
+            />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="text" @click="crud.cancelCU">取消</el-button>
+          <el-button @click="closeTip">取消</el-button>
           <el-button
-            :loading="crud.status.cu === 2"
+            :loading="crud.cu === 2"
             type="primary"
-            @click="crud.submitCU"
+            @click="getServiceValue"
           >确认</el-button>
         </div>
       </el-dialog>
       <!--表格渲染-->
-      <el-table
-        ref="table"
-        v-loading="crud.loading"
-        border
-        :data="crud.data"
-        size="small"
-        style="width: 100%"
-      >
+      <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;">
         <el-table-column align="center" prop="index" label="序号" width="60px" />
+        <el-table-column v-permission="(['admin','getGameUserList:edit','getGameUserList:del'])" label="操作" width="90px" align="center">
+          <template slot-scope="scope">
+            <el-popover placement="bottom-end" popper-class="chProo" trigger="click">
+              <el-button slot="reference" size="mini" icon="el-icon-setting">
+                <i class="fa fa-caret-down" aria-hidden="true" />
+              </el-button>
+              <div class="dise">
+                <div class="edit">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="updatePass(scope.row)"
+                  >重置密码</el-button>
+                </div>
+                <div class="edit">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="updateEmail(scope.row)"
+                  >设置邮箱</el-button>
+                </div>
+                <div class="edit">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="lockGameUser(scope.row)"
+                  >冻结用户</el-button>
+                </div>
+                <div class="edit">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    icon="el-icon-edit"
+                    @click="disLockGameUser(scope.row)"
+                  >解除冻结</el-button>
+                </div>
+                <el-button
+                  size="mini"
+                  type="success"
+                  icon="el-icon-refresh"
+                  @click="uploadGameInfo(scope.row)"
+                >更新缓存</el-button>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="username" label="用户账号" width="140px" />
         <el-table-column align="center" prop="passport" label="passport" width="155px" />
         <el-table-column
@@ -229,17 +236,6 @@
         <el-table-column align="center" prop="telephone" label="电话" />
         <el-table-column v-if="isShow" align="center" prop="password" label="密码" />
         <el-table-column v-if="isShow" align="center" prop="userkey" label="userkey" />
-
-        <el-table-column
-          v-if="checkPer(['admin', 'gameUser:edit', 'gameUser:del'])"
-          label="操作"
-          width="150px"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <udOperation :data="scope.row" :permission="permission" />
-          </template>
-        </el-table-column>
       </el-table>
       <!--分页组件-->
       <pagination />
@@ -248,11 +244,11 @@
 </template>
 
 <script>
-import crudGameUser from '@/api/lpuser/getGameUserList'
+import { GameUser, updatePass, updateEmail, gameUserCleanCache, lockGameUser, disLockGameUser } from '@/api/lpuser/getGameUserList'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
-import udOperation from '@crud/UD.operation'
+// import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 
 const defaultForm = {
@@ -276,7 +272,7 @@ const defaultForm = {
 }
 export default {
   name: 'GameUser',
-  components: { pagination, crudOperation, rrOperation, udOperation },
+  components: { pagination, crudOperation, rrOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
     return CRUD({
@@ -284,12 +280,19 @@ export default {
       url: '/api/lpGameUser/getGameUserList',
       idField: 'id',
       sort: 'id,desc',
-      crudMethod: { ...crudGameUser }
+      crudMethod: { ...GameUser }
     })
   },
   data() {
     return {
       isShow: false,
+      isShowDelg: false,
+      isHidden: false,
+      scopeData: {
+        passport: null,
+        vercodeKey: null,
+        email: null
+      },
       permission: {
         add: ['admin', 'gameUser:add'],
         edit: ['admin', 'gameUser:edit'],
@@ -348,7 +351,9 @@ export default {
           { required: true, message: '不能为空', trigger: 'blur' }
         ],
         passport: [{ required: true, message: '不能为空', trigger: 'blur' }]
-      }
+      },
+      curdHook: '',
+      delogTitle: ''
     }
   },
   methods: {
@@ -358,13 +363,195 @@ export default {
     },
     exportExels() {
       this.isShow = !this.isShow
+    },
+    updatePass(data) {
+      this.isShowDelg = !this.isShowDelg
+      this.curdHook = 'updatePass'
+      this.delogTitle = '重置密码'
+      this.scopeData.passport = data.passport
+    },
+    updateEmail(data) {
+      this.isShowDelg = !this.isShowDelg
+      this.curdHook = 'updateEmail'
+      this.delogTitle = '设置邮箱'
+      this.isHidden = true
+      this.scopeData.passport = data.passport
+    },
+    lockGameUser(data) {
+      this.isShowDelg = !this.isShowDelg
+      this.curdHook = 'lockGameUser'
+      this.delogTitle = '冻结用户'
+      this.scopeData.passport = data.passport
+    },
+    disLockGameUser(data) {
+      this.isShowDelg = !this.isShowDelg
+      this.curdHook = 'disLockGameUser'
+      this.delogTitle = '解除冻结'
+      this.scopeData.passport = data.passport
+    },
+    uploadGameInfo(data) {
+      gameUserCleanCache(data.passport).then((res) => {
+        console.log(res)
+      })
+    },
+    closeTip() {
+      this.isShowDelg = !this.isShowDelg
+      this.scopeData.vercodeKey = ''
+      if (this.isHidden) {
+        this.isHidden = false
+      }
+    },
+    beforClose() {
+      this.isShowDelg = !this.isShowDelg
+      this.scopeData.vercodeKey = ''
+      if (this.isHidden) {
+        this.isHidden = false
+      }
+    },
+    getServiceValue() {
+      switch (this.curdHook) {
+        case 'updatePass':
+          if (this.scopeData.passport && this.scopeData.vercodeKey) {
+            updatePass(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
+              console.log(res)
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+
+          break
+        case 'updateEmail':
+          if (this.scopeData.passport && this.scopeData.vercodeKey && this.scopeData.email) {
+            updateEmail(this.scopeData.passport, this.scopeData.vercodeKey, this.scopeData.email).then((res) => {
+              console.log(res)
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+        case 'lockGameUser':
+          if (this.scopeData.passport && this.scopeData.vercodeKey) {
+            lockGameUser(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
+              console.log(res)
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+        case 'disLockGameUser':
+          if (this.scopeData.passport && this.scopeData.vercodeKey) {
+            disLockGameUser(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
+              console.log(res)
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+      }
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+  .el-popover.chProo{
+ position: absolute;
+  background: #fff;
+  min-width: 100px;
+  border-radius: 4px;
+  border: 1px solid #e6ebf5;
+  padding: 12px;
+  z-index: 2000;
+  color: #606266;
+  line-height: 1.4;
+  text-align: justify;
+  font-size: 14px;
+  -webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  word-break: break-all;
+  .popper__arrow {
+    left: 78px !important;
+  }
+}
+</style>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+
 ::v-deep .crud-opts-left {
   display: none;
+}
+.dise{
+  display: flex !important;
+  flex-direction: column !important;
+  .edit{
+    margin-bottom: 10px;
+  }
+}
+.postin{
+  position: absolute;
+}
+
+::v-deep .el-dialog__wrapper {
+  .el-dialog {
+    height: 35%;
+    overflow: auto;
+    .el-dialog__header {
+      padding: 20px;
+      padding-bottom: 10px;
+      background: #438eb9;
+      .el-dialog__title {
+        line-height: 24px;
+        font-size: 18px;
+        color: #fff;
+      }
+      .el-dialog__headerbtn{
+        .el-dialog__close{
+          color: #fff;
+        }
+      }
+    }
+    .el-dialog__body {
+      padding: 0 1px;
+      color: #606266;
+      font-size: 14px;
+      word-break: break-all;
+      .el-form-item {
+        margin-bottom: 5px;
+        border-bottom: 1px solid #ccc;
+        padding: 5px 0;
+        .el-form-item__content {
+          line-height: 40px;
+          position: relative;
+          font-size: 14px;
+          border-left: 1px solid #ccc;
+          padding: 0 10px;
+        }
+      }
+    }
+    .el-dialog__footer {
+      padding: 20px;
+      padding-top: 10px;
+      text-align: center;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      border-bottom: 1px solid #ccc;
+    }
+  }
 }
 </style>

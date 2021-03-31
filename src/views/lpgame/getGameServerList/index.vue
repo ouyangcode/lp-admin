@@ -224,7 +224,13 @@
         <el-table-column align="center" prop="gamecode" label="游戏代码" />
         <el-table-column align="center" prop="servername" label="服务器名" />
         <el-table-column align="center" prop="servercode" label="服务器编码" width="120px" />
-        <el-table-column align="center" prop="opType" label="经营类型" />
+        <el-table-column align="center" prop="opType" label="经营类型">
+          <template slot-scope="scope">
+            <div v-if="scope.row.opType === 'own'">{{ "自家经营" }}</div>
+            <div v-if="scope.row.opType === 'lianyin'">{{ "联营" }}</div>
+            <div v-if="scope.row.opType === 'proxy'">{{ "代理独家经营" }}</div>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="opentime" label="开服时间" width="160px" />
         <el-table-column align="center" prop="paysign" label="充值开关">
           <template slot-scope="scope">
@@ -261,7 +267,15 @@
         <el-table-column align="center" prop="loginKey" label="登录加密串" width="160px" />
         <el-table-column align="center" prop="payKey" label="登录加密串" width="160px" />
         <el-table-column align="center" prop="infoKey" label="获取角色加密串" width="160px" />
-        <el-table-column align="center" prop="serversgin" label="所属地区" />
+        <el-table-column align="center" prop="serversgin" label="所属地区" width="120px">
+          <template slot-scope="scope">
+            <div v-if="scope.row.serversgin === '0'">{{ "港澳臺平臺" }}</div>
+            <div v-if="scope.row.serversgin === '1'">{{ "新馬泰平臺" }}</div>
+            <div v-if="scope.row.serversgin === '2'">{{ "港澳平臺" }}</div>
+            <div v-if="scope.row.serversgin === '3'">{{ "台灣平臺" }}</div>
+            <div v-if="scope.row.serversgin === '4'">{{ "大陸平臺" }}</div>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="serverrcommend" label="是否推荐">
           <template slot-scope="scope">
             <div v-if="scope.row.paysign === 1">
