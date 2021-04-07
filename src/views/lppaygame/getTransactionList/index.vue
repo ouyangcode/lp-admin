@@ -93,7 +93,7 @@
           align="center"
           prop="serialNumber"
           label="订单号"
-          width="200px"
+          width="220px"
         />
         <el-table-column
           align="center"
@@ -204,7 +204,7 @@ export default {
     return CRUD({
       title: '交易流水列表',
       url: '/api/lpTransaction/getTransactionList',
-      sort: 'tid',
+      sort: 'tid,desc',
       crudMethod: { ...transaction }
     })
   },

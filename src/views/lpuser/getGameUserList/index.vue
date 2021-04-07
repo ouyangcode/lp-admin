@@ -94,7 +94,6 @@
           </el-select>
           <rrOperation />
         </div>
-
       </div>
 
       <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
@@ -116,19 +115,17 @@
           label-width="150px"
         >
           <el-form-item label="用户passport">
-            <el-input v-model="scopeData.passport" disabled style="width: 80%" />
+            <el-input
+              v-model="scopeData.passport"
+              disabled
+              style="width: 80%"
+            />
           </el-form-item>
           <el-form-item label="验证密钥">
-            <el-input
-              v-model="scopeData.vercodeKey"
-              style="width: 80%"
-            />
+            <el-input v-model="scopeData.vercodeKey" style="width: 80%" />
           </el-form-item>
           <el-form-item v-if="isHidden" label="用户Email">
-            <el-input
-              v-model="scopeData.email"
-              style="width: 80%"
-            />
+            <el-input v-model="scopeData.email" style="width: 80%" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -140,12 +137,44 @@
           >确认</el-button>
         </div>
       </el-dialog>
+      <el-dialog title="用户游戏" :visible.sync="isShowGame" width="30%">
+        <div class="game">
+          <span>{{ gameDataList }}</span>
+        </div>
+        <span slot="footer" class="dialog-footer" />
+      </el-dialog>
       <!--表格渲染-->
-      <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;">
-        <el-table-column align="center" prop="index" label="序号" width="60px" />
-        <el-table-column v-permission="(['admin','getGameUserList:edit','getGameUserList:del'])" label="操作" width="90px" align="center">
+      <el-table
+        ref="table"
+        v-loading="crud.loading"
+        border
+        :data="crud.data"
+        size="small"
+        style="width: 100%"
+      >
+        <el-table-column
+          align="center"
+          prop="index"
+          label="序号"
+          width="60px"
+        />
+        <el-table-column
+          v-permission="[
+            'admin',
+            'getGameUserList:edit',
+            'getGameUserList:del',
+          ]"
+          fixed="right"
+          label="操作"
+          width="90px"
+          align="center"
+        >
           <template slot-scope="scope">
-            <el-popover placement="bottom-end" popper-class="chProo" trigger="click">
+            <el-popover
+              placement="bottom-end"
+              popper-class="chProo"
+              trigger="click"
+            >
               <el-button slot="reference" size="mini" icon="el-icon-setting">
                 <i class="fa fa-caret-down" aria-hidden="true" />
               </el-button>
@@ -169,16 +198,24 @@
                 <div class="edit">
                   <el-button
                     size="mini"
-                    type="primary"
-                    icon="el-icon-edit"
+                    type="warning"
+                    icon="el-icon-s-open"
+                    @click="getGameUserPlayGames(scope.row)"
+                  >获取游戏</el-button>
+                </div>
+                <div v-if="scope.row.disabled === 0" class="edit">
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    icon="el-icon-warning-outline"
                     @click="lockGameUser(scope.row)"
                   >冻结用户</el-button>
                 </div>
-                <div class="edit">
+                <div v-if="scope.row.disabled === -1" class="edit">
                   <el-button
                     size="mini"
-                    type="primary"
-                    icon="el-icon-edit"
+                    type="danger"
+                    icon="el-icon-warning-outline"
                     @click="disLockGameUser(scope.row)"
                   >解除冻结</el-button>
                 </div>
@@ -192,17 +229,42 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="username" label="用户账号" width="140px" />
-        <el-table-column align="center" prop="passport" label="passport" width="155px" />
+        <el-table-column
+          align="center"
+          prop="username"
+          label="用户账号"
+          width="140px"
+        />
+        <el-table-column
+          align="center"
+          prop="passport"
+          label="passport"
+          width="155px"
+        />
         <el-table-column
           align="center"
           prop="siteUsername"
           label="第三方用户id"
           width="165px"
         />
-        <el-table-column align="center" prop="sitecode" label="来源" width="110px" />
-        <el-table-column align="center" prop="email" label="邮箱" width="180px" />
-        <el-table-column align="center" prop="regip" label="ip地址" width="130px" />
+        <el-table-column
+          align="center"
+          prop="sitecode"
+          label="来源"
+          width="110px"
+        />
+        <el-table-column
+          align="center"
+          prop="email"
+          label="邮箱"
+          width="180px"
+        />
+        <el-table-column
+          align="center"
+          prop="regip"
+          label="ip地址"
+          width="130px"
+        />
         <el-table-column align="center" prop="isupgrade" label="是否升级">
           <template slot-scope="scope">
             <div v-if="scope.row.isupgrade === 1">
@@ -215,10 +277,10 @@
         </el-table-column>
         <el-table-column align="center" prop="disabled" label="是否冻结">
           <template slot-scope="scope">
-            <div v-if="scope.row.isupgrade === 1">
+            <div v-if="scope.row.disabled === -1">
               {{ "是" }}
             </div>
-            <div v-if="scope.row.isupgrade === 0">
+            <div v-if="scope.row.disabled === 0">
               {{ "否" }}
             </div>
           </template>
@@ -234,8 +296,18 @@
         <el-table-column align="center" prop="birthday" label="生日" />
         <el-table-column align="center" prop="identityCard" label="身份证" />
         <el-table-column align="center" prop="telephone" label="电话" />
-        <el-table-column v-if="isShow" align="center" prop="password" label="密码" />
-        <el-table-column v-if="isShow" align="center" prop="userkey" label="userkey" />
+        <el-table-column
+          v-if="isShow"
+          align="center"
+          prop="password"
+          label="密码"
+        />
+        <el-table-column
+          v-if="isShow"
+          align="center"
+          prop="userkey"
+          label="userkey"
+        />
       </el-table>
       <!--分页组件-->
       <pagination />
@@ -244,7 +316,15 @@
 </template>
 
 <script>
-import { GameUser, updatePass, updateEmail, gameUserCleanCache, lockGameUser, disLockGameUser } from '@/api/lpuser/getGameUserList'
+import {
+  GameUser,
+  updatePass,
+  updateEmail,
+  gameUserCleanCache,
+  lockGameUser,
+  disLockGameUser,
+  getGameUserPlayGames
+} from '@/api/lpuser/getGameUserList'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -286,6 +366,7 @@ export default {
   data() {
     return {
       isShow: false,
+      isShowGame: false,
       isShowDelg: false,
       isHidden: false,
       scopeData: {
@@ -293,6 +374,7 @@ export default {
         vercodeKey: null,
         email: null
       },
+      gameDataList: [],
       permission: {
         add: ['admin', 'gameUser:add'],
         edit: ['admin', 'gameUser:edit'],
@@ -390,8 +472,20 @@ export default {
       this.scopeData.passport = data.passport
     },
     uploadGameInfo(data) {
+      this.crud.loading = true
       gameUserCleanCache(data.passport).then((res) => {
-        console.log(res)
+        this.crud.loading = false
+        this.crud.notify('更新成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+        this.crud.refresh()
+      })
+    },
+    getGameUserPlayGames(data) {
+      this.crud.loading = true
+      getGameUserPlayGames(data.passport).then((res) => {
+        this.crud.loading = false
+        this.crud.notify('获取成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+        this.gameDataList = res.rst
+        this.isShowGame = true
       })
     },
     closeTip() {
@@ -412,10 +506,17 @@ export default {
       switch (this.curdHook) {
         case 'updatePass':
           if (this.scopeData.passport && this.scopeData.vercodeKey) {
-            updatePass(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
-              console.log(res)
-              this.isShowDelg = !this.isShowDelg
-            })
+            updatePass(this.scopeData.passport, this.scopeData.vercodeKey).then(
+              (res) => {
+                this.crud.notify('重置成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+                this.crud.refresh()
+                this.scopeData.vercodeKey = ''
+                if (this.isHidden) {
+                  this.isHidden = false
+                }
+                this.isShowDelg = !this.isShowDelg
+              }
+            )
           } else {
             this.$message({
               message: '请填入必填参数',
@@ -425,9 +526,22 @@ export default {
 
           break
         case 'updateEmail':
-          if (this.scopeData.passport && this.scopeData.vercodeKey && this.scopeData.email) {
-            updateEmail(this.scopeData.passport, this.scopeData.vercodeKey, this.scopeData.email).then((res) => {
-              console.log(res)
+          if (
+            this.scopeData.passport &&
+            this.scopeData.vercodeKey &&
+            this.scopeData.email
+          ) {
+            updateEmail(
+              this.scopeData.passport,
+              this.scopeData.vercodeKey,
+              this.scopeData.email
+            ).then((res) => {
+              this.crud.notify('设置成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+              this.crud.refresh()
+              this.scopeData.vercodeKey = ''
+              if (this.isHidden) {
+                this.isHidden = false
+              }
               this.isShowDelg = !this.isShowDelg
             })
           } else {
@@ -439,8 +553,16 @@ export default {
           break
         case 'lockGameUser':
           if (this.scopeData.passport && this.scopeData.vercodeKey) {
-            lockGameUser(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
-              console.log(res)
+            lockGameUser(
+              this.scopeData.passport,
+              this.scopeData.vercodeKey
+            ).then((res) => {
+              this.crud.notify('冻结成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+              this.crud.refresh()
+              this.scopeData.vercodeKey = ''
+              if (this.isHidden) {
+                this.isHidden = false
+              }
               this.isShowDelg = !this.isShowDelg
             })
           } else {
@@ -452,8 +574,16 @@ export default {
           break
         case 'disLockGameUser':
           if (this.scopeData.passport && this.scopeData.vercodeKey) {
-            disLockGameUser(this.scopeData.passport, this.scopeData.vercodeKey).then((res) => {
-              console.log(res)
+            disLockGameUser(
+              this.scopeData.passport,
+              this.scopeData.vercodeKey
+            ).then((res) => {
+              this.crud.notify('解冻成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+              this.crud.refresh()
+              this.scopeData.vercodeKey = ''
+              if (this.isHidden) {
+                this.isHidden = false
+              }
               this.isShowDelg = !this.isShowDelg
             })
           } else {
@@ -470,8 +600,8 @@ export default {
 </script>
 
 <style lang="scss">
-  .el-popover.chProo{
- position: absolute;
+.el-popover.chProo {
+  position: absolute;
   background: #fff;
   min-width: 100px;
   border-radius: 4px;
@@ -492,27 +622,28 @@ export default {
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-
 ::v-deep .crud-opts-left {
   display: none;
 }
-.dise{
+.dise {
   display: flex !important;
   flex-direction: column !important;
-  .edit{
+  .edit {
     margin-bottom: 10px;
   }
 }
-.postin{
+.postin {
   position: absolute;
 }
-
+.game {
+  padding: 10px;
+}
 ::v-deep .el-dialog__wrapper {
   .el-dialog {
     height: 35%;
     overflow: auto;
     .el-dialog__header {
-      padding: 20px;
+      padding: 6px;
       padding-bottom: 10px;
       background: #438eb9;
       .el-dialog__title {
@@ -520,8 +651,17 @@ export default {
         font-size: 18px;
         color: #fff;
       }
-      .el-dialog__headerbtn{
-        .el-dialog__close{
+      .el-dialog__headerbtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        font-size: 16px;
+        .el-dialog__close {
           color: #fff;
         }
       }
@@ -550,7 +690,6 @@ export default {
       text-align: center;
       -webkit-box-sizing: border-box;
       box-sizing: border-box;
-      border-bottom: 1px solid #ccc;
     }
   }
 }

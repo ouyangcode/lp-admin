@@ -22,6 +22,7 @@ import Vue from 'vue'
 function CRUD(options) {
   const defaultOptions = {
     tag: 'default',
+    target: null,
     // id字段名
     idField: 'id',
     // 标题
@@ -515,12 +516,23 @@ function CRUD(options) {
       Object.keys(crud.params).length !== 0 && Object.keys(crud.params).forEach(item => {
         if (crud.params[item] === null || crud.params[item] === '') crud.params[item] = undefined
       })
-      return {
-        page: crud.page.page - 1,
-        size: crud.page.size,
-        sort: crud.sort,
-        ...crud.query,
-        ...crud.params
+      if (crud.url === '/api/lpidcDomain/getLpidcDomainList') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          tag: 0,
+          ...crud.query,
+          ...crud.params
+        }
+      } else {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          ...crud.query,
+          ...crud.params
+        }
       }
     },
     // 当前页改变

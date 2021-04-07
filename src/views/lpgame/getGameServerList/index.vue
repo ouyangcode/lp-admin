@@ -194,7 +194,7 @@
       >
         <el-table-column v-if="isShow" align="center" prop="gsid" label="gsid" width="60px" />
         <el-table-column align="center" prop="index" label="序号" width="60px" />
-        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" label="操作" width="90px" align="center">
+        <el-table-column v-permission="['admin', 'gameRoom:edit', 'gameRoom:add', 'gameRoom:del']" fixed="right" label="操作" width="90px" align="center">
           <template slot-scope="scope">
             <el-popover placement="bottom-end" popper-class="chProo" trigger="click">
               <el-button slot="reference" size="mini" icon="el-icon-setting">
@@ -234,31 +234,31 @@
         <el-table-column align="center" prop="opentime" label="开服时间" width="160px" />
         <el-table-column align="center" prop="paysign" label="充值开关">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
-            </div>
             <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+              {{ "开放" }}
+            </div>
+            <div v-if="scope.row.paysign === 1">
+              {{ "屏蔽" }}
             </div>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="goinsign" label="入口开关">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
+            <div v-if="scope.row.goinsign === 0">
+              {{ "开放" }}
             </div>
-            <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+            <div v-if="scope.row.goinsign === 1">
+              {{ "屏蔽" }}
             </div>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="isshow" label="平台展示">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
+            <div v-if="scope.row.isshow === 0">
+              {{ "开放" }}
             </div>
-            <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+            <div v-if="scope.row.isshow === 1">
+              {{ "屏蔽" }}
             </div>
           </template>
         </el-table-column>
@@ -278,31 +278,31 @@
         </el-table-column>
         <el-table-column align="center" prop="serverrcommend" label="是否推荐">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
+            <div v-if="scope.row.serverrcommend === 0">
+              {{ "是" }}
             </div>
-            <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+            <div v-if="scope.row.serverrcommend === 1">
+              {{ "否" }}
             </div>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="hotdegree" label="是否热门">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
+            <div v-if="scope.row.hotdegree === 0">
+              {{ "是" }}
             </div>
-            <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+            <div v-if="scope.row.hotdegree === 1">
+              {{ "否" }}
             </div>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="newserver" label="是否新服">
           <template slot-scope="scope">
-            <div v-if="scope.row.paysign === 1">
-              {{ "开" }}
+            <div v-if="scope.row.newserver === 0">
+              {{ "是" }}
             </div>
-            <div v-if="scope.row.paysign === 0">
-              {{ "关" }}
+            <div v-if="scope.row.newserver === 1">
+              {{ "否" }}
             </div>
           </template>
         </el-table-column>

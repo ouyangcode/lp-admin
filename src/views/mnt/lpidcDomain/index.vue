@@ -6,17 +6,42 @@
         <!-- 搜索 -->
         <el-input v-model="query.ip" clearable placeholder="请输入ip" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <el-input v-model="query.domain" clearable placeholder="请输入域名" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select
+          v-model="query.tag"
+          clearable
+          size="small"
+          placeholder="状态查询"
+          class="filter-item"
+          style="width: 150px"
+        >
+          <el-option
+            v-for="item in delList"
+            :key="item.key"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
         <el-date-picker
           v-model="query.domainexpired"
-          placeholder="选择日期"
-          value-format="yyyy-MM-dd hh:mm:ss"
+          :default-time="['00:00:00', '23:59:59']"
+          type="daterange"
+          range-separator=":"
+          size="small"
           class="date-item"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          start-placeholder="域名创建时间"
+          end-placeholder="域名到期时间"
         />
         <el-date-picker
           v-model="query.sslexpired"
-          placeholder="选择日期"
+          :default-time="['00:00:00', '23:59:59']"
+          type="daterange"
+          range-separator=":"
+          size="small"
           class="date-item"
-          value-format="yyyy-MM-dd hh:mm:ss"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          start-placeholder="SSL创建时间"
+          end-placeholder="SSL到期时间"
         />
         <rrOperation :crud="crud" />
         <el-button
@@ -34,9 +59,6 @@
       <!--表单组件-->
       <el-dialog :visible.sync="isShowDelg" top="2vh" :title="delogTitle" width="750px">
         <el-form ref="form" :model="scopeData" :rules="rules" size="small" label-width="120px">
-          <el-form-item label="id">
-            <el-input v-model="scopeData.id" style="width: 370px;" />
-          </el-form-item>
           <el-form-item label="gamename">
             <el-input v-model="scopeData.gamename" style="width: 370px;" />
           </el-form-item>
@@ -52,14 +74,20 @@
           <el-form-item label="domainexpired">
             <el-date-picker v-model="scopeData.domainexpired" type="datetime" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="isssl">
-            <el-input v-model="scopeData.isssl" style="width: 370px;" />
+          <el-form-item label="是否SSL">
+            <el-radio-group v-model="scopeData.isssl">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="sslexpired">
             <el-date-picker v-model="scopeData.sslexpired" type="datetime" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="tag">
-            <el-input v-model="scopeData.tag" style="width: 370px;" />
+          <el-form-item label="是否删除">
+            <el-radio-group v-model="scopeData.tag">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -69,7 +97,8 @@
       </el-dialog>
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;">
-        <el-table-column align="center" prop="id" label="id" />
+        <el-table-column v-if="isShow" align="center" prop="id" label="id" />
+        <el-table-column align="center" prop="index" label="序号" />
         <el-table-column v-if="checkPer(['admin','lpidcDomain:edit','lpidcDomain:del'])" label="操作" width="90px" align="center">
           <template slot-scope="scope">
             <el-popover placement="bottom-end" popper-class="chProo" trigger="click">
@@ -97,14 +126,24 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="gamename" label="gamename" />
-        <el-table-column align="center" prop="packagename" label="packagename" />
+        <el-table-column align="center" prop="gamename" label="游戏名" />
+        <el-table-column align="center" prop="packagename" label="包名" />
         <el-table-column align="center" prop="ip" label="ip" />
-        <el-table-column align="center" prop="domain" label="domain" />
-        <el-table-column align="center" prop="domainexpired" label="domainexpired" />
-        <el-table-column align="center" prop="isssl" label="isssl" />
-        <el-table-column align="center" prop="sslexpired" label="sslexpired" />
-        <el-table-column align="center" prop="tag" label="tag" />
+        <el-table-column align="center" prop="domain" label="域名" />
+        <el-table-column align="center" prop="domainexpired" label="域名有效期" />
+        <el-table-column align="center" prop="isssl" label="是否ssL">
+          <template slot-scope="scope">
+            <div v-if="scope.row.isssl === 1">{{ "是" }}</div>
+            <div v-if="scope.row.isssl === 0">{{ "否" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="sslexpired" label="ssl有效期" />
+        <el-table-column align="center" prop="tag" label="是否删除">
+          <template slot-scope="scope">
+            <div v-if="scope.row.tag === 1">{{ "是" }}</div>
+            <div v-if="scope.row.tag === 0">{{ "否" }}</div>
+          </template>
+        </el-table-column>
 
       </el-table>
       <!--分页组件-->
@@ -127,11 +166,12 @@ export default {
   components: { pagination, crudOperation, rrOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'lpidcDomain', url: '/api/lpidcDomain/getLpidcDomainList', idField: 'id', sort: 'id,desc', crudMethod: { ...crudLpidcDomain }})
+    return CRUD({ title: 'lpidcDomain', url: '/api/lpidcDomain/getLpidcDomainList', idField: 'id', sort: 'id,desc', target: '0', crudMethod: { ...crudLpidcDomain }})
   },
   data() {
     return {
       isShowDelg: false,
+      isShow: false,
       permission: {
         add: ['admin', 'lpidcDomain:add'],
         edit: ['admin', 'lpidcDomain:edit'],
@@ -143,6 +183,10 @@ export default {
       queryTypeOptions: [
         { key: 'ip', display_name: 'ip' },
         { key: 'domain', display_name: 'domain' }
+      ],
+      delList: [
+        { label: '已删除', value: 1 },
+        { label: '未删除', value: 0 }
       ],
       curdHook: '',
       delogTitle: ''
@@ -171,7 +215,7 @@ export default {
     },
     delGameInfo(data) {
       var params = []
-      params.push(data.grid)
+      params.push(data.id)
       this.$confirm(`确认删除选中的数据?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -225,7 +269,7 @@ export default {
 
 <style lang="scss">
   .el-popover.chProo{
- position: absolute;
+  position: absolute;
   background: #fff;
   min-width: 100px;
   border-radius: 4px;

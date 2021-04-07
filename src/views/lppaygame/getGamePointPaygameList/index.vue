@@ -203,7 +203,7 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="roleid"
+          prop="passport"
           label="用户id"
           width="200px"
         />
@@ -211,7 +211,7 @@
           align="center"
           prop="orderId"
           label="lp订单号"
-          width="150px"
+          width="220px"
         />
         <el-table-column
           align="center"
@@ -224,6 +224,11 @@
           prop="servercode"
           label="游戏服代码"
           width="100px"
+        />
+        <el-table-column
+          align="center"
+          prop="param1"
+          label="金额(USD)"
         />
         <el-table-column
           align="center"
@@ -259,11 +264,6 @@
           align="center"
           prop="param"
           label="param"
-        />
-        <el-table-column
-          align="center"
-          prop="param1"
-          label="param1"
         />
         <el-table-column
           align="center"

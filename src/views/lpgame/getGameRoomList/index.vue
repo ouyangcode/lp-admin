@@ -223,6 +223,7 @@
           label="操作"
           width="90px"
           align="center"
+          fixed="right"
         >
           <template slot-scope="scope">
             <el-popover
@@ -304,8 +305,10 @@
         </el-table-column>
         <el-table-column align="center" prop="disable" label="展示">
           <template slot-scope="scope">
-            <div v-if="scope.row.disable === 1">{{ "展示" }}</div>
-            <div v-if="scope.row.disable === 0">{{ "屏蔽" }}</div>
+            <div v-if="scope.row.disable === 0">{{ "开放" }}</div>
+            <div v-if="scope.row.disable === 1">{{ "屏蔽" }}</div>
+            <div v-if="scope.row.disable === 2">{{ "维护" }}</div>
+            <div v-if="scope.row.disable === 3">{{ "未开服" }}</div>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="runstate" label="运行状态">
