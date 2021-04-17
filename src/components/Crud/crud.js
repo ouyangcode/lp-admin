@@ -2,10 +2,7 @@ import {
   initData,
   download
 } from '@/api/data'
-import {
-  parseTime,
-  downloadFile
-} from '@/utils/index'
+import { parseTime, downloadFile, setDefaultStratime, setDefaultEndtime } from '@/utils/index'
 import {
   Object
 } from 'core-js'
@@ -46,6 +43,9 @@ function CRUD(options) {
     query: {},
     // 查询数据的参数
     params: {},
+    defaultStart: null,
+    defaultEnd: null,
+    renderTitle: null,
     // Form 表单
     form: {},
     // 重置表单
@@ -260,11 +260,9 @@ function CRUD(options) {
             data.content.forEach((item, index) => {
               item.index = (crud.page.page - 1) * crud.page.size + index + 1
             })
-            console.log(data.content.index)
             crud.data = data.content
             crud.data.gameCodeList = data.gameCodeList
             crud.data.channelList = data.channelList
-            console.log(crud.data)
           }
           crud.resetDataStatus()
           // time 毫秒后显示表格
@@ -516,12 +514,126 @@ function CRUD(options) {
       Object.keys(crud.params).length !== 0 && Object.keys(crud.params).forEach(item => {
         if (crud.params[item] === null || crud.params[item] === '') crud.params[item] = undefined
       })
+      const getData = new Date()
+      const getEndData = new Date()
+
+      crud.defaultStart = setDefaultStratime(getData.setTime(getData.getTime() - 3600 * 1000 * 24 * 7))
+      crud.defaultEnd = setDefaultEndtime(getEndData)
+
       if (crud.url === '/api/lpidcDomain/getLpidcDomainList') {
         return {
           page: crud.page.page - 1,
           size: crud.page.size,
           sort: crud.sort,
           tag: 0,
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMycardIngameTw') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          stime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMycardBillingTw') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          sdate: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMycardDj') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          stime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMycardAuth') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          stime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMycardDjnew') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          stime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionGooglepay') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          stime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionApplepay') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          time: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionPaypal') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          time: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionOnestore') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          createtime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionHuawei') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          createtime: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMol') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          time: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/transactionMolChannel') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          time: [crud.defaultStart, crud.defaultEnd],
           ...crud.query,
           ...crud.params
         }

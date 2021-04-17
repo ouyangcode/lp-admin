@@ -159,11 +159,6 @@
           width="60px"
         />
         <el-table-column
-          v-permission="[
-            'admin',
-            'getGameUserList:edit',
-            'getGameUserList:del',
-          ]"
           fixed="right"
           label="操作"
           width="90px"
@@ -181,6 +176,7 @@
               <div class="dise">
                 <div class="edit">
                   <el-button
+                    :disabled="!checkPer(['admin','GameUser:editPassword'])"
                     size="mini"
                     type="primary"
                     icon="el-icon-edit"
@@ -189,6 +185,7 @@
                 </div>
                 <div class="edit">
                   <el-button
+                    :disabled="!checkPer(['admin','GameUser:editEmail'])"
                     size="mini"
                     type="primary"
                     icon="el-icon-edit"
@@ -197,6 +194,7 @@
                 </div>
                 <div class="edit">
                   <el-button
+                    :disabled="!checkPer(['admin','GameUser:gameUserPlaygames'])"
                     size="mini"
                     type="warning"
                     icon="el-icon-s-open"
@@ -205,6 +203,7 @@
                 </div>
                 <div v-if="scope.row.disabled === 0" class="edit">
                   <el-button
+                    :disabled="!checkPer(['admin','GameUser:lockGameUser'])"
                     size="mini"
                     type="danger"
                     icon="el-icon-warning-outline"
@@ -213,6 +212,7 @@
                 </div>
                 <div v-if="scope.row.disabled === -1" class="edit">
                   <el-button
+                    :disabled="!checkPer(['admin','GameUser:disLockGameUser'])"
                     size="mini"
                     type="danger"
                     icon="el-icon-warning-outline"
@@ -220,6 +220,7 @@
                   >解除冻结</el-button>
                 </div>
                 <el-button
+                  :disabled="!checkPer(['admin','GameUser:cleanCache'])"
                   size="mini"
                   type="success"
                   icon="el-icon-refresh"

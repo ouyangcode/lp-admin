@@ -4,7 +4,7 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
-        <el-input v-model="query.ip" clearable placeholder="请输入ip" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+
         <el-input v-model="query.domain" clearable placeholder="请输入域名" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <el-select
           v-model="query.tag"
@@ -29,19 +29,8 @@
           size="small"
           class="date-item"
           value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="域名创建时间"
-          end-placeholder="域名到期时间"
-        />
-        <el-date-picker
-          v-model="query.sslexpired"
-          :default-time="['00:00:00', '23:59:59']"
-          type="daterange"
-          range-separator=":"
-          size="small"
-          class="date-item"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="SSL创建时间"
-          end-placeholder="SSL到期时间"
+          start-placeholder="有效期"
+          end-placeholder="有效期"
         />
         <rrOperation :crud="crud" />
         <el-button
@@ -62,17 +51,14 @@
           <el-form-item label="gamename">
             <el-input v-model="scopeData.gamename" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="packagename">
+          <el-form-item v-if="isShow" label="packagename">
             <el-input v-model="scopeData.packagename" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="ip">
+          <el-form-item v-if="isShow" label="ip">
             <el-input v-model="scopeData.ip" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="domain">
             <el-input v-model="scopeData.domain" style="width: 370px;" />
-          </el-form-item>
-          <el-form-item label="domainexpired">
-            <el-date-picker v-model="scopeData.domainexpired" type="datetime" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="是否SSL">
             <el-radio-group v-model="scopeData.isssl">
@@ -80,7 +66,10 @@
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="sslexpired">
+          <el-form-item label="有效期">
+            <el-date-picker v-model="scopeData.domainexpired" type="datetime" style="width: 370px;" />
+          </el-form-item>
+          <el-form-item v-if="isShow" label="sslexpired">
             <el-date-picker v-model="scopeData.sslexpired" type="datetime" style="width: 370px;" />
           </el-form-item>
           <el-form-item label="是否删除">
@@ -127,17 +116,17 @@
           </template>
         </el-table-column>
         <el-table-column align="center" prop="gamename" label="游戏名" />
-        <el-table-column align="center" prop="packagename" label="包名" />
-        <el-table-column align="center" prop="ip" label="ip" />
+        <el-table-column v-if="isShow" align="center" prop="packagename" label="包名" />
+        <el-table-column v-if="isShow" align="center" prop="ip" label="ip" />
         <el-table-column align="center" prop="domain" label="域名" />
-        <el-table-column align="center" prop="domainexpired" label="域名有效期" />
+        <el-table-column align="center" prop="domainexpired" label="有效期" />
         <el-table-column align="center" prop="isssl" label="是否ssL">
           <template slot-scope="scope">
             <div v-if="scope.row.isssl === 1">{{ "是" }}</div>
             <div v-if="scope.row.isssl === 0">{{ "否" }}</div>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="sslexpired" label="ssl有效期" />
+        <el-table-column v-if="isShow" align="center" prop="sslexpired" label="ssl有效期" />
         <el-table-column align="center" prop="tag" label="是否删除">
           <template slot-scope="scope">
             <div v-if="scope.row.tag === 1">{{ "是" }}</div>
@@ -166,7 +155,7 @@ export default {
   components: { pagination, crudOperation, rrOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'lpidcDomain', url: '/api/lpidcDomain/getLpidcDomainList', idField: 'id', sort: 'id,desc', target: '0', crudMethod: { ...crudLpidcDomain }})
+    return CRUD({ title: 'lpidcDomain', url: '/api/lpidcDomain/getLpidcDomainList', idField: 'id', sort: 'domainexpired', target: '0', crudMethod: { ...crudLpidcDomain }})
   },
   data() {
     return {

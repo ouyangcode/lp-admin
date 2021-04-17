@@ -8,22 +8,6 @@
         <div class="select_tool">
           <!-- 搜索 -->
           <el-select
-            v-if="isShow"
-            v-model="query.tagDL"
-            clearable
-            size="small"
-            placeholder="账单查询"
-            class="filter-item"
-            style="width: 120px"
-          >
-            <el-option
-              v-for="item in tagDL"
-              :key="item.key"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          <el-select
             v-model="query.gamecode"
             clearable
             size="small"
@@ -39,53 +23,67 @@
             />
           </el-select>
           <el-input
-            v-model="query.gamecode"
-            clearable
-            placeholder="游戏代码"
-            style="width: 100px"
-            class="filter-item"
-            @keyup.enter.native="crud.toQuery"
-          />
-          <el-input
-            v-model="query.servercode"
-            clearable
-            placeholder="游戏服"
-            style="width: 100px"
-            class="filter-item"
-            @keyup.enter.native="crud.toQuery"
-          />
-          <el-input
             v-model="query.passport"
             clearable
-            placeholder="passport"
+            placeholder="lp平台用户ID"
+            style="width: 150px"
+            class="filter-item"
+            @keyup.enter.native="crud.toQuery"
+          />
+          <el-input
+            v-model="query.gamermyUserId"
+            clearable
+            placeholder="联运商用户ID"
+            style="width: 150px"
+            class="filter-item"
+            @keyup.enter.native="crud.toQuery"
+          />
+          <el-input
+            v-model="query.lunplayOrderId"
+            clearable
+            placeholder="lp订单号"
             style="width: 170px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
           <el-input
-            v-model="query.packageName"
+            v-model="query.gamermyOrderId"
             clearable
-            placeholder="包名"
+            placeholder="联运商订单号"
             style="width: 175px"
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
-          <el-input
-            v-model="query.orderId"
+          <el-select
+            v-model="query.sitecode"
             clearable
-            placeholder="订单号"
-            style="width: 180px"
+            size="small"
+            placeholder="联运商代码"
             class="filter-item"
-            @keyup.enter.native="crud.toQuery"
-          />
-          <el-input
-            v-model="query.roleid"
+            style="width: 120px"
+          >
+            <el-option
+              v-for="item in sitecodeList"
+              :key="item.key"
+              :label="item.type"
+              :value="item.id"
+            />
+          </el-select>
+          <el-select
+            v-model="query.status"
             clearable
-            placeholder="roleid"
-            style="width: 110px"
+            size="small"
+            placeholder="订单状态"
             class="filter-item"
-            @keyup.enter.native="crud.toQuery"
-          />
+            style="width: 100px"
+          >
+            <el-option
+              v-for="item in statusList"
+              :key="item.key"
+              :label="item.type"
+              :value="item.id"
+            />
+          </el-select>
           <van-calendar v-model="isVisible" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
           <template v-if="!isShowTime">
             <div class="changDate">
@@ -110,8 +108,7 @@
             </div>
           </template>
           <el-date-picker
-            v-if="isShowTime"
-            v-model="query.crtime"
+            v-model="query.stime"
             :default-time="['00:00:00', '23:59:59']"
             type="daterange"
             range-separator=":"
@@ -121,43 +118,12 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
           />
-
-          <el-select
-            v-model="query.status"
-            clearable
-            size="small"
-            placeholder="状态"
-            class="filter-item"
-            style="width: 100px"
-          >
-            <el-option
-              v-for="item in statusList"
-              :key="item.key"
-              :label="item.type"
-              :value="item.id"
-            />
-          </el-select>
-          <el-select
-            v-model="query.param"
-            clearable
-            size="small"
-            placeholder="储值查询"
-            class="filter-item"
-            style="width: 100px"
-          >
-            <el-option
-              v-for="item in gameAdList"
-              :key="item.key"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
         </div>
         <rrOperation />
         <el-button
           v-if="crud.optShow.download"
           :loading="crud.downloadLoading"
-          :disabled="!checkPer(['admin','gamePointPaygame:download'])"
+          :disabled="!checkPer(['admin','transactionGamermy:download'])"
           class="filter-item postio"
           size="mini"
           type="warning"
@@ -193,12 +159,9 @@
           width="85px"
         >
           <template slot-scope="scope">
-            <div v-if="scope.row.status === '10'">
-              {{ '需要补点' }}
-            </div>
-            <div v-if="scope.row.status !== '10'">
-              {{ gameOptions[scope.row.status] }}
-            </div>
+            <div v-if="scope.row.status === 1">{{ "步驟1" }}</div>
+            <div v-if="scope.row.status === 2">{{ "成功" }}</div>
+            <div v-if="scope.row.status === 3">{{ "需要补点" }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -209,8 +172,20 @@
         />
         <el-table-column
           align="center"
-          prop="orderId"
+          prop="lunplayOrderId"
           label="lp订单号"
+          width="220px"
+        />
+        <el-table-column
+          align="center"
+          prop="gamermyOrderId"
+          label="联运商订单号"
+          width="220px"
+        />
+        <el-table-column
+          align="center"
+          prop="gamermyUserId"
+          label="联运商用户ID"
           width="220px"
         />
         <el-table-column
@@ -227,67 +202,37 @@
         />
         <el-table-column
           align="center"
-          prop="param1"
-          label="金额(USD)"
+          prop="amount"
+          label="金额"
         />
         <el-table-column
           align="center"
-          prop="lpoint"
-          label="储值L点"
+          prop="disabled"
+          label="是不展示"
           width="80px"
+        >
+          <template slot-scope="scope">
+            <div v-if="scope.row.disabled === 0">{{ "否" }}</div>
+            <div v-if="scope.row.disabled === 1">{{ "是" }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          align="center"
+          prop="stime"
+          label="储值时间"
+          width="150px"
         />
         <el-table-column
           align="center"
-          prop="gamepiont"
-          label="储值游戏币"
-          width="100px"
-        />
-        <el-table-column
-          align="center"
-          prop="packageName"
-          label="游戏包"
-          width="120px"
-        />
-        <el-table-column
-          align="center"
-          prop="userIp"
+          prop="userip"
           label="ip"
           width="150px"
         />
         <el-table-column
           align="center"
-          prop="userArea"
-          label="用户国家"
-          width="150px"
-        />
-        <el-table-column
-          align="center"
-          prop="param"
-          label="param"
-        />
-        <el-table-column
-          align="center"
-          prop="crtime"
-          label="储值时间"
-          width="140px"
-        />
-        <el-table-column
-          align="center"
-          prop="roleid"
-          label="roleid"
+          prop="username"
+          label="用户名"
           width="110px"
-        />
-        <el-table-column
-          align="center"
-          prop="itemcode"
-          label="itemcode"
-          width="110px"
-        />
-        <el-table-column
-          align="center"
-          prop="registerdate"
-          label="registerdate"
-          width="140px"
         />
       </el-table>
       <!--分页组件-->
@@ -297,7 +242,7 @@
 </template>
 
 <script>
-import { GetGamePointPaygameList } from '@/api/lppaygame/getGamePointPaygameList'
+import { GetGamePointPaygameList } from '@/api/lppaygame/getTransactionGamermyList'
 import { getAllGameCode } from '@/api/lpgame/getGameServerList'
 import { download } from '@/api/data'
 import { downloadFile, parseTimes } from '@/utils/index'
@@ -333,9 +278,9 @@ export default {
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
     return CRUD({
-      title: '用户兑换流水',
-      url: '/api/lpGamePointPaygame/getGamePointPaygameList',
-      sort: 'gmid,desc',
+      title: '联运商储值流水',
+      url: '/api/lpTransactionGamermy/getTransactionGamermyList',
+      sort: 'id,desc',
       crudMethod: { ...GetGamePointPaygameList }
     })
   },
@@ -390,13 +335,13 @@ export default {
         ]
       },
       statusList: [
-        { id: 0, type: '成功' },
         { id: 1, type: '步骤1' },
-        { id: 2, type: '补点成功' },
-        { id: 3, type: '退还L点' },
-        { id: 4, type: '取消订单' },
-        { id: 5, type: '测试' },
-        { id: 10, type: '需要补点' }
+        { id: 2, type: '成功' },
+        { id: 3, type: '需要补点' }
+      ],
+      sitecodeList: [
+        { id: 'memoriki', type: 'memoriki' },
+        { id: 'pubgamemb', type: 'pubgamemb' }
       ],
       gameOptions: [
         '成功', '步骤1', '补点成功', '退还L点', '取消订单', '测试'
