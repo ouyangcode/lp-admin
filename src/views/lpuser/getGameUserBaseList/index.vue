@@ -28,6 +28,11 @@
         <el-table-column align="center" prop="passport" label="passport" width="155px" />
         <el-table-column align="center" prop="totalpoint" label="储值总L点" />
         <el-table-column align="center" prop="usepoint" label="使用总L点" />
+        <el-table-column align="center" prop="point" label="剩余L点">
+          <template slot-scope="scope">
+            {{ scope.row.totalpoint - scope.row.usepoint }}
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="userkey" label="userkey" width="150px" />
         <el-table-column align="center" prop="lastChangeTime" label="最后一次更改时间" width="140px" />
         <el-table-column align="center" prop="lastChangeType" label="最后一次更改类型" width="140px" />

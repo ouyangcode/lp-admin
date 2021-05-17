@@ -58,7 +58,7 @@
             <p>{{ scope.row.gameCode }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="allLpoint" align="center" label="总储值UID" />
+        <el-table-column prop="allUid" align="center" label="总储值UID" />
         <el-table-column prop="allUSD" align="center" label="总储值USD(2020.5.16开始的数据)" />
         <el-table-column prop="dayUid" align="center" width="100px" label="日储值UID">
           <template slot-scope="scope">

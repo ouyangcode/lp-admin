@@ -2,7 +2,6 @@
   <div class="app-container">
     <!--工具栏-->
     <div class="head-container">
-      <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
         <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
@@ -11,7 +10,7 @@
         <el-button
           v-if="crud.optShow.download"
           :loading="crud.downloadLoading"
-          :disabled="!checkPer(['admin','transactionOnestoreItem:add'])"
+          :disabled="!checkPer(['admin','transactionExchangerateDict:add'])"
           class="filter-item postin"
           size="mini"
           type="primary"
@@ -19,14 +18,16 @@
           @click="addGameInfo()"
         >新增</el-button>
       </div>
+      <!--如果想在工具栏加入更多按钮，可以使用插槽方式， slot = 'left' or 'right'-->
       <crudOperation :permission="permission" />
       <!--表单组件-->
       <el-dialog
         :visible.sync="isShowDelg"
+        :rules="rules"
         width="750px"
         top="5vh"
         height="95%"
-        title="新增"
+        :title="dlogTitle"
       >
         <el-form
           ref="form"
@@ -35,56 +36,25 @@
           size="small"
           label-width="120px"
         >
-          <el-form-item label="游戏名称">
-            <el-select
-              v-model="scopeData.gamecode"
-              placeholder="全部游戏查询"
-              style="width: 130px"
-            >
-              <el-option
-                v-for="item in gameCodeList"
-                :key="item.key"
-                :label="item.gamename+'-'+item.gamecode"
-                :value="item.gamecode"
-              />
-            </el-select>
+          <el-form-item label="currencyName">
+            <el-input v-model="scopeData.currencyname" placeholder="请输入汇率名" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="packagename">
-            <el-input v-model="scopeData.packagename" placeholder="请输入包名" style="width: 80%" />
+          <el-form-item label="currencyCode">
+            <el-input v-model="scopeData.currencycode" placeholder="请输入汇率代码" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="itemcode">
-            <el-input v-model="scopeData.itemcode" placeholder="请输入itemcode" style="width: 80%" />
+          <el-form-item label="currencyRate">
+            <el-input v-model="scopeData.currencyrate" placeholder="请输入汇率值" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="money">
-            <el-input v-model="scopeData.money" placeholder="请输入金额" style="width: 80%" />
+          <el-form-item label="是否有效">
+            <el-radio v-model="scopeData.stag" :label="0">开放</el-radio>
+            <el-radio v-model="scopeData.stag" :label="1">禁用</el-radio>
           </el-form-item>
-          <el-form-item label="currency">
-            <el-input v-model="scopeData.currency" placeholder="请输入currency" style="width: 80%" />
-          </el-form-item>
-          <el-form-item label="lpoint">
-            <el-input v-model="scopeData.lpoint" placeholder="请输入lpoint" style="width: 80%" />
-          </el-form-item>
-          <el-form-item label="moneyhkd">
-            <el-input
-              v-model="scopeData.moneyhkd"
-              placeholder="请输入moneyhkd"
-              style="width: 80%"
-            />
-          </el-form-item>
-          <el-form-item label="moneyusd">
-            <el-input
-              v-model="scopeData.moneyusd"
-              placeholder="请输入moneyusd"
-              style="width: 80%"
-            />
-          </el-form-item>
-          <el-form-item label="是否展示">
-            <el-radio v-model="scopeData.status" :label="0">隐藏</el-radio>
-            <el-radio v-model="scopeData.status" :label="1">展示</el-radio>
+          <el-form-item label="操作密钥">
+            <el-input v-model="scopeData.mykey" placeholder="请输入操作密钥" style="width: 80%" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="isShowDelg = !isShowDelg">取消</el-button>
+          <el-button @click="closeTip">取消</el-button>
           <el-button
             :loading="crud.cu === 2"
             type="primary"
@@ -95,24 +65,24 @@
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column align="center" prop="index" label="序号" />
-        <el-table-column align="center" prop="gamecode" label="gamecode" width="110px" />
-        <el-table-column align="center" prop="packagename" label="packagename" width="150px" />
-        <el-table-column align="center" prop="itemcode" label="itemcode" width="130px" />
-        <el-table-column align="center" prop="money" label="money" width="110px" />
-        <el-table-column align="center" prop="lpoint" label="lpoint" width="110px" />
-        <el-table-column align="center" prop="currency" label="currency" width="100px" />
-        <el-table-column align="center" prop="moneyhkd" label="moneyhkd" width="110px" />
-        <el-table-column align="center" prop="moneyusd" label="moneyusd" width="110px" />
-        <el-table-column v-if="isShow" align="center" prop="createby" label="createby" />
-        <el-table-column align="center" prop="createtime" label="createtime" width="150px" />
-        <el-table-column align="center" prop="status" label="status">
+        <el-table-column align="center" prop="currencyname" label="currencyName" width="120px" />
+        <el-table-column align="center" prop="currencycode" label="currencyCode" width="120px" />
+        <el-table-column align="center" prop="currencyrate" label="currencyRate" width="120px" />
+        <el-table-column align="center" prop="pw" label="pw" width="240px" />
+        <el-table-column align="center" prop="stag" label="状态">
           <template slot-scope="scope">
-            <div v-if="scope.row.status === 0">{{ "删除" }}</div>
-            <div v-if="scope.row.status === 1">{{ "展示" }}</div>
+            <div v-if="scope.row.stag === 0">{{ "开放" }}</div>
+            <div v-if="scope.row.stag === 1">{{ "禁用" }}</div>
           </template>
         </el-table-column>
-        <el-table-column v-if="isShow" align="center" prop="addr1" label="addr1" />
-        <el-table-column v-if="isShow" align="center" prop="addr2" label="addr2" />
+        <el-table-column align="center" prop="cacheInfo" label="Redis缓存值" width="350px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.cacheInfo }}</span><span v-if="scope.row.isfix === '✔'" style="color:green">{{ scope.row.isfix }}</span>
+            <span v-if="scope.row.isfix === '×'" style="color:red">{{ scope.row.isfix }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" prop="suser" label="操作人" width="120px" />
+        <el-table-column align="center" prop="stime" label="stime" width="150px" />
         <el-table-column label="操作" width="90px" align="center" fixed="right">
           <template slot-scope="scope">
             <el-popover
@@ -128,8 +98,8 @@
                 <div class="edit">
                   <el-button
                     size="mini"
-                    :disabled="!checkPer(['admin','transactionOnestoreItem:edit'])"
                     type="primary"
+                    :disabled="!checkPer(['admin','transactionExchangerateDict:edit'])"
                     icon="el-icon-edit"
                     @click="editGameServerInfo(scope.row)"
                   >编辑</el-button>
@@ -146,51 +116,49 @@
 </template>
 
 <script>
-import { crudTransactionOnestoreItem, add, edit } from '@/api/lpconfig/storeItemConfig/transactionOnestoreItem'
-import { getAllGameCode } from '@/api/lpgame/getGameServerList'
+import { crudTransactionExchangerateDictList, add, edit } from '@/api/lpconfig/commonconfig/getTransactionExchangerateDictList'
 import { parseTime } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 
-const defaultForm = { id: null, gamecode: null, packagename: null, itemcode: null, money: null, lpoint: null, currency: null, moneyhkd: null, moneyusd: null, createby: null, createtime: null, status: null, addr1: null, addr2: null }
+const defaultForm = { id: null, channel: null, status: null, content: null, name: null, paykey: null, serverIp: null }
 export default {
-  name: 'TransactionOnestoreItem',
+  name: 'TransactionExchangerateDictList',
   components: { pagination, crudOperation, rrOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'transactionOnestoreItem', url: '/api/lpTransactionOnestoreItem/getTransactionOnestoreItemList', idField: 'id', sort: 'id,desc', crudMethod: { ...crudTransactionOnestoreItem }})
+    return CRUD({ title: 'TransactionExchangerateDictList', url: '/api/lpTransactionExchangerateDict/getTransactionExchangerateDictList', idField: 'id', sort: 'id,desc', crudMethod: { ...crudTransactionExchangerateDictList }})
   },
   data() {
     return {
       permission: {
-        add: ['admin', 'transactionOnestoreItem:add'],
-        edit: ['admin', 'transactionOnestoreItem:edit'],
-        del: ['admin', 'transactionOnestoreItem:del']
+        add: ['admin', 'transactionChannel:add'],
+        edit: ['admin', 'transactionChannel:edit'],
+        del: ['admin', 'transactionChannel:del']
       },
       rules: {
+        mykey: [
+          { required: true, message: '请输入密钥', trigger: 'blur' }
+        ]
       },
+      queryTypeOptions: [
+        { key: 'channel', display_name: 'channel' }
+      ],
       isShowDelg: false,
       isShow: false,
-      scopeData: { id: null, gamecode: null, packagename: null, itemcode: null, money: null, lpoint: null, currency: null, moneyhkd: null, moneyusd: null, createby: null, createtime: null, status: null, addr1: null, addr2: null },
+      scopeData: {
+        currencyname: null, currencycode: null, currencyrate: null, stag: null, mykey: null, id: null
+      },
       curdHook: '',
-      dlogTitle: '',
-      gameCodeList: []
+      dlogTitle: ''
     }
-  },
-  created() {
-    this.getGameCodeList()
   },
   methods: {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
     [CRUD.HOOK.beforeRefresh]() {
       return true
-    },
-    getGameCodeList() {
-      getAllGameCode().then(res => {
-        this.gameCodeList = res
-      })
     },
     addGameInfo() {
       for (var key in this.scopeData) {
@@ -211,9 +179,17 @@ export default {
     getServiceValue() {
       switch (this.curdHook) {
         case 'add':
-          this.scopeData.createtime = parseTime(new Date())
+          this.scopeData.stime = parseTime(new Date())
           add(this.scopeData).then((res) => {
-            this.crud.addSuccessNotify()
+            if (res.code === '1') {
+              this.$notify({
+                title: '警告',
+                message: res.msg,
+                type: 'warning'
+              })
+            } else {
+              this.crud.addSuccessNotify()
+            }
             this.isShowDelg = !this.isShowDelg
             for (var key in this.scopeData) {
               this.scopeData[key] = null
@@ -225,7 +201,16 @@ export default {
           console.log(this.scopeData)
           edit(this.scopeData)
             .then((res) => {
-              this.crud.editSuccessNotify()
+              if (res.code === '1') {
+                this.$notify({
+                  title: '警告',
+                  message: res.msg,
+                  type: 'warning'
+                })
+              } else {
+                this.crud.editSuccessNotify()
+              }
+
               this.isShowDelg = !this.isShowDelg
               for (var key in this.scopeData) {
                 this.scopeData[key] = null
@@ -291,7 +276,7 @@ export default {
 
 ::v-deep .el-dialog__wrapper {
   .el-dialog {
-    height: 85%;
+    height: 66%;
     overflow: auto;
     .el-dialog__header {
       padding: 20px;

@@ -102,7 +102,7 @@
       <el-dialog
         :visible.sync="isShowDelg"
         width="450px"
-        top="25vh"
+        top="10vh"
         height="30%"
         :title="delogTitle"
         :before-close="beforClose"
@@ -114,18 +114,30 @@
           size="small"
           label-width="150px"
         >
-          <el-form-item label="用户passport">
+          <el-form-item v-if="isPass" label="用户passport">
             <el-input
               v-model="scopeData.passport"
               disabled
               style="width: 80%"
             />
           </el-form-item>
-          <el-form-item label="验证密钥">
-            <el-input v-model="scopeData.vercodeKey" style="width: 80%" />
+          <el-form-item v-if="isUp" label="旧账号名">
+            <el-input v-model="scopeData.username" disabled style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="isUp" label="新账号名">
+            <el-input v-model="scopeData.newUsername" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="isUp" label="新密码">
+            <el-input v-model="scopeData.password" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="isUp" label="新重复密码">
+            <el-input v-model="scopeData.repassword" style="width: 80%" />
           </el-form-item>
           <el-form-item v-if="isHidden" label="用户Email">
             <el-input v-model="scopeData.email" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="操作密钥">
+            <el-input v-model="scopeData.vercodeKey" style="width: 80%" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -200,6 +212,15 @@
                     icon="el-icon-s-open"
                     @click="getGameUserPlayGames(scope.row)"
                   >获取游戏</el-button>
+                </div>
+                <div class="edit">
+                  <el-button
+                    :disabled="!checkPer(['admin','GameUser:upgradeUserAccount'])"
+                    size="mini"
+                    type="success"
+                    icon="el-icon-sugar"
+                    @click="upgradeUserAccount(scope.row)"
+                  >会员升级</el-button>
                 </div>
                 <div v-if="scope.row.disabled === 0" class="edit">
                   <el-button
@@ -324,7 +345,8 @@ import {
   gameUserCleanCache,
   lockGameUser,
   disLockGameUser,
-  getGameUserPlayGames
+  getGameUserPlayGames,
+  upgradeUserAccount
 } from '@/api/lpuser/getGameUserList'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
@@ -370,6 +392,7 @@ export default {
       isShowGame: false,
       isShowDelg: false,
       isHidden: false,
+      isPass: true,
       scopeData: {
         passport: null,
         vercodeKey: null,
@@ -436,7 +459,8 @@ export default {
         passport: [{ required: true, message: '不能为空', trigger: 'blur' }]
       },
       curdHook: '',
-      delogTitle: ''
+      delogTitle: '',
+      isUp: false
     }
   },
   methods: {
@@ -459,6 +483,17 @@ export default {
       this.delogTitle = '设置邮箱'
       this.isHidden = true
       this.scopeData.passport = data.passport
+    },
+    upgradeUserAccount(data) {
+      document.querySelector('.el-dialog').style.height = '60%'
+      this.isShowDelg = !this.isShowDelg
+      this.curdHook = 'upgradeUserAccount'
+      this.delogTitle = '会员升级'
+      this.isHidden = true
+      this.isUp = true
+      this.isPass = false
+      this.scopeData.username = data.username
+      console.log(data)
     },
     lockGameUser(data) {
       this.isShowDelg = !this.isShowDelg
@@ -491,16 +526,26 @@ export default {
     },
     closeTip() {
       this.isShowDelg = !this.isShowDelg
-      this.scopeData.vercodeKey = ''
-      if (this.isHidden) {
+      for (var key in this.scopeData) {
+        this.scopeData[key] = null
+      }
+      if (this.isHidden || this.isUp) {
         this.isHidden = false
+        this.isUp = false
+        this.isPass = true
+        document.querySelector('.el-dialog').style.height = '35%'
       }
     },
     beforClose() {
       this.isShowDelg = !this.isShowDelg
-      this.scopeData.vercodeKey = ''
-      if (this.isHidden) {
+      for (var key in this.scopeData) {
+        this.scopeData[key] = null
+      }
+      if (this.isHidden || this.isUp) {
         this.isHidden = false
+        this.isUp = false
+        this.isPass = true
+        document.querySelector('.el-dialog').style.height = '35%'
       }
     },
     getServiceValue() {
@@ -542,6 +587,50 @@ export default {
               this.scopeData.vercodeKey = ''
               if (this.isHidden) {
                 this.isHidden = false
+              }
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+        case 'upgradeUserAccount':
+          if (
+            this.scopeData.newUsername &&
+            this.scopeData.password &&
+            this.scopeData.repassword &&
+            this.scopeData.vercodeKey &&
+            this.scopeData.email
+          ) {
+            var form = {
+              username: this.scopeData.username,
+              newUsername: this.scopeData.newUsername,
+              password: this.scopeData.password,
+              repassword: this.scopeData.repassword,
+              email: this.scopeData.email,
+              vercodeKey: this.scopeData.vercodeKey
+            }
+            upgradeUserAccount(form).then((res) => {
+              if (res.code === '1110') {
+                this.crud.notify('设置成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+                this.crud.refresh()
+              } else {
+                this.$message({
+                  message: res.msg,
+                  type: 'warning'
+                })
+              }
+              for (var key in this.scopeData) {
+                this.scopeData[key] = null
+              }
+              if (this.isHidden || this.isUp) {
+                this.isHidden = false
+                this.isUp = false
+                this.isPass = true
+                document.querySelector('.el-dialog').style.height = '35%'
               }
               this.isShowDelg = !this.isShowDelg
             })

@@ -367,7 +367,7 @@ export default {
 
 ::v-deep .el-dialog__wrapper {
   .el-dialog {
-    height: 53%;
+    height: 53vh;
     .el-dialog__header {
       padding: 20px;
       padding-bottom: 10px;

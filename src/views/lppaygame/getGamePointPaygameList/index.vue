@@ -34,7 +34,7 @@
             <el-option
               v-for="item in gameItemList"
               :key="item.key"
-              :label="item.gamename +'(' + item.gamecode+')'"
+              :label="item.gamename + '(' + item.gamecode + ')'"
               :value="item.gamecode"
             />
           </el-select>
@@ -86,7 +86,13 @@
             class="filter-item"
             @keyup.enter.native="crud.toQuery"
           />
-          <van-calendar v-model="isVisible" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
+          <van-calendar
+            v-model="isVisible"
+            :min-date="minDate"
+            :max-date="maxDate"
+            type="range"
+            @confirm="onConfirm"
+          />
           <template v-if="!isShowTime">
             <div class="changDate">
               <input
@@ -106,7 +112,11 @@
                 @click="hovePick"
                 @focus="hiddenCode"
               >
-              <i v-if="isHidd" class="el-icon-circle-close closeInp" @click="delInp" />
+              <i
+                v-if="isHidd"
+                class="el-icon-circle-close closeInp"
+                @click="delInp"
+              />
             </div>
           </template>
           <el-date-picker
@@ -157,7 +167,7 @@
         <el-button
           v-if="crud.optShow.download"
           :loading="crud.downloadLoading"
-          :disabled="!checkPer(['admin','gamePointPaygame:download'])"
+          :disabled="!checkPer(['admin', 'gamePointPaygame:download'])"
           class="filter-item postio"
           size="mini"
           type="warning"
@@ -167,36 +177,108 @@
       </div>
 
       <crudOperation :permission="permission" />
-
+      <el-dialog
+        :visible.sync="isShowDelg"
+        width="550px"
+        top="10vh"
+        height="45%"
+        :title="delogTitle"
+        :before-close="beforClose"
+      >
+        <el-form
+          ref="form"
+          :model="scopeData"
+          :rules="rules"
+          size="small"
+          label-width="130px"
+        >
+          <el-form-item label="LP订单号">
+            <el-input v-model="scopeData.orderId" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="ishidd" label="用户id">
+            <el-input v-model="scopeData.passport" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="isforStatu" label="游戏服代码">
+            <el-input v-if="ishidd" v-model="scopeData.servercode" style="width: 80%" />
+            <el-select
+              v-if="isShowSev"
+              v-model="scopeData.servercode"
+              clearable
+              size="small"
+              placeholder="状态"
+              class="filter-item"
+              style="width: 100px"
+            >
+              <el-option
+                v-for="item in serverCodeList"
+                :key="item.key"
+                :label="item.servername"
+                :value="item.servercode"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="ishidd" label="param">
+            <el-input v-model="scopeData.param" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="ishidd" label="roleid">
+            <el-input v-model="scopeData.roleid" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="ishidd" label="itemCode">
+            <el-input v-model="scopeData.itemcode" style="width: 80%" />
+          </el-form-item>
+          <el-form-item v-if="isShowStatu" label="状态">
+            <el-select
+              v-model="scopeData.status"
+              clearable
+              size="small"
+              placeholder="状态"
+              class="filter-item"
+              style="width: 100px"
+            >
+              <el-option
+                v-for="item in statusList"
+                :key="item.key"
+                :label="item.type"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="操作密钥">
+            <el-input v-model="scopeData.vercodeKey" style="width: 80%" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="text" @click="closeTip">取消</el-button>
+          <el-button
+            :loading="crud.status.cu === 2"
+            type="primary"
+            @click="getServiceValue"
+          >确认</el-button>
+        </div>
+      </el-dialog>
       <!--表格渲染-->
       <el-table
         ref="table"
         v-loading="crud.loading"
-        :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+        :header-cell-style="{ background: '#eef1f6', color: '#606266' }"
         :data="crud.data"
         size="small"
         style="width: 100%"
         border
         @selection-change="crud.selectionChangeHandler"
       >
-
         <el-table-column
           align="center"
           prop="index"
           label="序号"
           width="85px"
         />
-        <el-table-column
-          align="center"
-          prop="status"
-          label="状态"
-          width="85px"
-        >
+        <el-table-column align="center" prop="status" label="状态" width="85px">
           <template slot-scope="scope">
-            <div v-if="scope.row.status === '10'">
-              {{ '需要补点' }}
+            <div v-if="scope.row.status === 10">
+              {{ "需要补点" }}
             </div>
-            <div v-if="scope.row.status !== '10'">
+            <div v-if="scope.row.status !== 10">
               {{ gameOptions[scope.row.status] }}
             </div>
           </template>
@@ -225,11 +307,7 @@
           label="游戏服代码"
           width="100px"
         />
-        <el-table-column
-          align="center"
-          prop="param1"
-          label="金额(USD)"
-        />
+        <el-table-column align="center" prop="param1" label="金额(USD)" />
         <el-table-column
           align="center"
           prop="lpoint"
@@ -260,11 +338,7 @@
           label="用户国家"
           width="150px"
         />
-        <el-table-column
-          align="center"
-          prop="param"
-          label="param"
-        />
+        <el-table-column align="center" prop="param" label="param" />
         <el-table-column
           align="center"
           prop="crtime"
@@ -289,6 +363,54 @@
           label="registerdate"
           width="140px"
         />
+        <el-table-column fixed="right" align="center" label="操作" width="90px">
+          <template slot-scope="scope">
+            <div>
+              <el-popover
+                placement="bottom-end"
+                popper-class="chProo"
+                trigger="click"
+              >
+                <el-button slot="reference" size="mini" icon="el-icon-setting">
+                  <i class="fa fa-caret-down" aria-hidden="true" />
+                </el-button>
+                <div class="dise">
+                  <div class="edit">
+                    <el-button
+                      size="mini"
+                      :disabled="!checkPer(['admin', 'gamePointPaygame:addPoint'])"
+                      type="primary"
+                      icon="el-icon-edit"
+                      @click="addPointGamePointPaygame(scope.row)"
+                    >兑换补点</el-button>
+                  </div>
+                  <div class="edit">
+                    <el-button
+                      size="mini"
+                      :disabled="
+                        !checkPer(['admin', 'gamePointPaygame:editGameServerCode'])
+                      "
+                      type="success"
+                      icon="el-icon-magic-stick"
+                      @click="editGameServerCode(scope.row)"
+                    >更新服代码</el-button>
+                  </div>
+                  <div class="edit">
+                    <el-button
+                      size="mini"
+                      :disabled="
+                        !checkPer(['admin', 'gamePointPaygame:editStatus'])
+                      "
+                      type="warning"
+                      icon="el-icon-refresh"
+                      @click="editStatusGamePointPaygame(scope.row)"
+                    >更新订单状态</el-button>
+                  </div>
+                </div>
+              </el-popover>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
       <!--分页组件-->
       <pagination />
@@ -297,7 +419,13 @@
 </template>
 
 <script>
-import { GetGamePointPaygameList } from '@/api/lppaygame/getGamePointPaygameList'
+import {
+  GetGamePointPaygameList,
+  addPointGamePointPaygame,
+  editGameServerCode,
+  editStatusGamePointPaygame,
+  getAllServerCode
+} from '@/api/lppaygame/getGamePointPaygameList'
 import { getAllGameCode } from '@/api/lpgame/getGameServerList'
 import { download } from '@/api/data'
 import { downloadFile, parseTimes } from '@/utils/index'
@@ -357,24 +485,25 @@ export default {
       valuenum: null,
       scopeData: {
         id: null,
-        status: null,
+        gamecode: null,
+        servercode: null,
+        roleid: null,
         passport: null,
-        username: null,
-        lunplay_orderID: null,
-        money: null,
-        productID: null,
-        serverCode: null,
-        payGame_lpoint: null,
-        time: null,
-        packageName: null,
-        siteCode: null,
-        ipAddress: null,
+        packagename: null,
+        content: null,
+        imageArray: null,
+        qusType: null,
+        type: null,
+        language: null,
+        os: null,
+        deviceInformation: null,
+        deviceVersion: null,
+        createtime: null,
+        ipaddress: null,
         country: null,
-        pay_tag: null,
-        Lpoint: null,
-        gameCode: null,
-        transactionID: null,
-        roleid: null
+        ansStatus: null,
+        delStatus: null,
+        status: null
       },
       permission: {
         add: ['admin', 'cusQuestionList:add'],
@@ -398,9 +527,7 @@ export default {
         { id: 5, type: '测试' },
         { id: 10, type: '需要补点' }
       ],
-      gameOptions: [
-        '成功', '步骤1', '补点成功', '退还L点', '取消订单', '测试'
-      ],
+      gameOptions: ['成功', '步骤1', '补点成功', '退还L点', '取消订单', '测试'],
       tagDL: [
         { label: '正式账单', value: '1' },
         { label: '内部测试账单', value: '2' }
@@ -410,6 +537,7 @@ export default {
         { label: 'Android官方储值', value: 'android' }
       ],
       gameItemList: [],
+      serverCodeList: [],
       getSelVal: '',
       flag: null,
       isShowTime: true,
@@ -418,7 +546,13 @@ export default {
       startrtime: '',
       endrtime: '',
       minDate: new Date(2012, 1, 1),
-      maxDate: new Date(2030, 1, 31)
+      maxDate: new Date(2030, 1, 31),
+      isShowSev: false,
+      isShowStatu: false,
+      ishidd: false,
+      isforStatu: true,
+      curdHook: '',
+      delogTitle: ''
     }
   },
   created: function() {
@@ -447,7 +581,7 @@ export default {
       if (this.query.crtime) {
         params.crtime = this.query.crtime
         download('/api/lpGamePointPaygame/download', params)
-          .then((result) => {
+          .then(result => {
             downloadFile(result, '列表数据', 'xlsx')
             this.crud.downloadLoading = false
           })
@@ -479,234 +613,242 @@ export default {
       this.isHidd = !this.isHidd
     },
     isMobile() {
-      const flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+      const flag = navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
       return flag
     },
     hiddenCode() {
       document.activeElement.blur()
+    },
+    addPointGamePointPaygame(data) {
+      this.scopeData = JSON.parse(JSON.stringify(data))
+      if (this.scopeData.status === 10) {
+        this.isShowDelg = !this.isShowDelg
+        this.ishidd = true
+        this.curdHook = 'addPointGamePointPaygame'
+        this.delogTitle = '兑换补点'
+      } else {
+        this.$message({
+          message: '不能操作',
+          type: 'warning'
+        })
+      }
+    },
+    editGameServerCode(data) {
+      this.scopeData = JSON.parse(JSON.stringify(data))
+      if (this.scopeData.status !== 0) {
+        getAllServerCode(this.scopeData.gamecode).then(res => {
+          console.log(res)
+          this.serverCodeList = res
+        })
+        this.scopeData.servercode = null
+        this.isShowDelg = !this.isShowDelg
+        this.isShowSev = true
+        this.curdHook = 'editGameServerCode'
+        this.delogTitle = '更新服代码'
+      } else {
+        this.$message({
+          message: '不能操作',
+          type: 'warning'
+        })
+      }
+    },
+    editStatusGamePointPaygame(data) {
+      this.isShowDelg = !this.isShowDelg
+      this.isShowStatu = true
+      this.isforStatu = false
+      this.curdHook = 'editStatusGamePointPaygame'
+      this.delogTitle = '更新订单状态'
+      this.scopeData = JSON.parse(JSON.stringify(data))
+      this.scopeData.status = null
+    },
+    closeTip() {
+      this.isShowDelg = !this.isShowDelg
+      this.scopeData = JSON.parse(JSON.stringify(this.scopeData))
+      for (var key in this.scopeData) {
+        this.scopeData[key] = null
+      }
+      if (this.isShowSev || this.isShowStatu || this.ishidd) {
+        this.isShowSev = false
+        this.isShowStatu = false
+        this.ishidd = false
+        this.isforStatu = true
+      }
+    },
+    beforClose() {
+      this.isShowDelg = !this.isShowDelg
+      this.scopeData = JSON.parse(JSON.stringify(this.scopeData))
+      for (var key in this.scopeData) {
+        this.scopeData[key] = null
+      }
+      if (this.isShowSev || this.isShowStatu || this.ishidd) {
+        this.isShowSev = false
+        this.isShowStatu = false
+        this.ishidd = false
+        this.isforStatu = true
+      }
+    },
+    getServiceValue() {
+      switch (this.curdHook) {
+        case 'addPointGamePointPaygame':
+          addPointGamePointPaygame(this.scopeData).then(res => {
+            this.scopeData = JSON.parse(JSON.stringify(this.scopeData))
+            for (var key in this.scopeData) {
+              this.scopeData[key] = null
+            }
+            this.isShowDelg = !this.isShowDelg
+            if (this.ishidd || this.isShowSev) {
+              this.ishidd = false
+              this.isShowSev = false
+            }
+            this.crud.notify(res.msg, CRUD.NOTIFICATION_TYPE.SUCCESS)
+            this.crud.refresh()
+          })
+          break
+        case 'editGameServerCode':
+          if (this.scopeData.orderId && this.scopeData.vercodeKey && this.scopeData.servercode) {
+            editGameServerCode(this.scopeData).then(res => {
+              this.crud.notify(res.msg, CRUD.NOTIFICATION_TYPE.SUCCESS)
+              this.crud.refresh()
+              this.scopeData = JSON.parse(JSON.stringify(this.scopeData))
+              for (var key in this.scopeData) {
+                this.scopeData[key] = null
+              }
+              if (this.isShowSev) {
+                this.isShowSev = false
+              }
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+        case 'editStatusGamePointPaygame':
+          if (this.scopeData.orderId && this.scopeData.vercodeKey) {
+            editStatusGamePointPaygame(
+              this.scopeData
+            ).then((res) => {
+              this.crud.notify('设置成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+              this.scopeData = JSON.parse(JSON.stringify(this.scopeData))
+              for (var key in this.scopeData) {
+                this.scopeData[key] = null
+              }
+              this.crud.refresh()
+              if (this.isShowStatu) {
+                this.isShowStatu = false
+                this.isforStatu = true
+              }
+              this.isShowDelg = !this.isShowDelg
+            })
+          } else {
+            this.$message({
+              message: '请填入必填参数',
+              type: 'warning'
+            })
+          }
+          break
+      }
     }
-
   }
 }
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-.changDate {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle;
-  margin-bottom: 10px;
-  height: 30.5px !important;
-  width: 230px !important;
-  border: 1px solid #dcdfe6;
-  background-color: #fff;
+<style lang="scss">
+.el-popover.chProo {
+  position: absolute;
+  background: #fff;
+  min-width: 100px;
   border-radius: 4px;
-  padding: 0 15px;
-  box-sizing: border-box;
-  span {
-    margin: 0 10px;
-  }
-  input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: none;
-    outline: none;
-    display: inline-block;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    width: 39%;
-    text-align: center;
-    font-size: 14px;
-    color: #606266;
-  }
-  .closeInp {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.35rem;
-    font-size: 14px;
+  border: 1px solid #e6ebf5;
+  padding: 12px;
+  z-index: 2000;
+  color: #606266;
+  line-height: 1.4;
+  text-align: justify;
+  font-size: 14px;
+  -webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  word-break: break-all;
+  .popper__arrow {
+    left: 78px !important;
   }
 }
+</style>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
 ::v-deep .crud-opts-left {
   display: none;
 }
-::v-deep .cell {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-::v-deep .el-dialog {
-  margin-top: 5vh;
-}
-
-.serviceSel {
-  float: right;
-}
-
-.postio{
-    position: absolute;
-}
-
-.changeRed {
-  color: red;
-}
-
-.demo-image__preview {
-  overflow: auto;
-}
-
-.el-form-item {
-  margin-bottom: 5px;
-}
-
-.el-image {
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-.clearfix {
-  *zoom: 1;
-}
-.clearfix::before {
-  display: table;
-  content: " ";
-}
-.clearfix::after {
-  clear: both;
-  display: table;
-  content: " ";
-}
-.userinfo {
-  width: 100%;
-  height: 150px;
-  display: flex;
-  .userinfo-left {
-    flex: 1;
-  }
-  .userinfo-center {
-    flex: 1;
-  }
-  .userinfo-right {
-    flex: 1;
-  }
-  .userinfo-top {
-    flex: 1;
+.dise {
+  display: flex !important;
+  flex-direction: column !important;
+  .edit {
+    margin-bottom: 10px;
   }
 }
-.showMsg {
+.postin {
   position: absolute;
-  top: 22px;
-  left: 110px;
-  font-size: 18px;
-  color: red;
-  font-weight: 600;
 }
-.el-dialog__body {
-  padding: 0px 20px;
-  color: #606266;
-  font-size: 14px;
-  word-break: break-all;
+.game {
+  padding: 10px;
 }
-.sockTip {
-  width: 100%;
-  height: 300px;
-  .chartContent {
-    width: 100%;
-    height: 250px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: rgba(0, 0, 0, 0.1);
+::v-deep .el-dialog__wrapper {
+  .el-dialog {
+    height: 50%;
     overflow: auto;
-    .content {
-      width: 100%;
-      border-radius: 5px;
-      .left-content {
-        padding: 10px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        .msg-date {
-          text-align: center;
-          color: gray;
-          font-size: 16px;
-          padding-left: 16px;
-        }
-        .usercontent {
-          float: left;
-          word-wrap: break-word;
-          word-break: break-all;
-          margin-left: 10px;
-          margin-top: 5px;
-          background-color: #fff;
-          width: 75%;
-          padding: 6px 10px;
-          border-radius: 10px;
-          font-size: 16px;
-        }
-        .left-start {
-          padding-left: 17px;
-        }
+    .el-dialog__header {
+      padding: 6px;
+      padding-bottom: 10px;
+      background: #438eb9;
+      .el-dialog__title {
+        line-height: 24px;
+        font-size: 18px;
+        color: #fff;
       }
-      .right-content {
-        padding: 10px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        .msg-date {
-          text-align: center;
-          color: gray;
-          font-size: 16px;
-          padding-right: 18px;
-        }
-        .servicecontent {
-          word-wrap: break-word;
-          word-break: break-all;
-          margin-right: 10px;
-          margin-top: 5px;
+      .el-dialog__headerbtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        font-size: 16px;
+        .el-dialog__close {
           color: #fff;
-          background-color: green;
-          width: 75%;
-          padding: 6px 10px;
-          border-radius: 10px;
-          font-size: 16px;
-          font-family: "Courier New", Courier, monospace;
-        }
-        .right-start {
-          padding-right: 20px;
         }
       }
     }
+    .el-dialog__body {
+      padding: 0 1px;
+      color: #606266;
+      font-size: 14px;
+      word-break: break-all;
+      .el-form-item {
+        margin-bottom: 5px;
+        border-bottom: 1px solid #ccc;
+        padding: 5px 0;
+        .el-form-item__content {
+          line-height: 30px;
+          position: relative;
+          font-size: 14px;
+          border-left: 1px solid #ccc;
+          padding: 0 10px;
+        }
+      }
+    }
+    .el-dialog__footer {
+      padding: 20px;
+      padding-top: 10px;
+      text-align: center;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
   }
-}
-.chatting-input {
-  display: flex;
-  height: 40px;
-  width: 100%;
-  margin-top: 12px;
-  .el-input {
-    flex: 1;
-    padding-left: 10px;
-    // padding-top: 10px;
-    height: 100%;
-    font-size: 18px;
-  }
-  button {
-    width: 90px;
-    height: 33px;
-    line-height: 8px;
-    background-color: #2196f3;
-    color: #fff;
-    font-size: 18px;
-  }
-}
-.serviceDel {
-  position: absolute;
-  top: 25px;
-  right: 23px;
 }
 </style>

@@ -2,7 +2,7 @@ module.exports = {
   /**
    * @description 网站标题
    */
-  title: 'LP-后台管理',
+  title: 'DM-后台管理',
   /**
    * @description 是否显示 tagsView
    */

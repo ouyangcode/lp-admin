@@ -6,10 +6,11 @@ export function add(form) {
     currencyname: form.currencyname,
     currencyrate: form.currencyrate,
     stag: form.stag,
-    stime: form.stime
+    stime: form.stime,
+    mykey: form.mykey
   }
   return request({
-    url: '/api/lpTransactionExchangerateDict/create/' + form.mykey,
+    url: '/api/lpTransactionExchangerateDict',
     method: 'post',
     data
   })
@@ -30,11 +31,12 @@ export function edit(form) {
     currencyrate: form.currencyrate,
     stag: form.stag,
     stime: form.stime,
-    id: form.id
+    id: form.id,
+    mykey: form.mykey
   }
   return request({
-    url: '/api/lpTransactionExchangerateDict/update/' + form.mykey,
-    method: 'post',
+    url: '/api/lpTransactionExchangerateDict',
+    method: 'put',
     data
   })
 }

@@ -108,6 +108,7 @@
             </div>
           </template>
           <el-date-picker
+            v-if="isShowTime"
             v-model="query.stime"
             :default-time="['00:00:00', '23:59:59']"
             type="daterange"
@@ -245,7 +246,7 @@
 import { GetGamePointPaygameList } from '@/api/lppaygame/getTransactionGamermyList'
 import { getAllGameCode } from '@/api/lpgame/getGameServerList'
 import { download } from '@/api/data'
-import { downloadFile, parseTimes } from '@/utils/index'
+import { downloadFile, parseTimes, parseTime } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -389,9 +390,9 @@ export default {
     },
     exportExels() {
       var params = this.crud.getQueryParams()
-      if (this.query.crtime) {
-        params.crtime = this.query.crtime
-        download('/api/lpGamePointPaygame/download', params)
+      if (this.query.stime) {
+        params.stime = this.query.stime
+        download('/api/lpTransactionGamermy/download', params)
           .then((result) => {
             downloadFile(result, '列表数据', 'xlsx')
             this.crud.downloadLoading = false
@@ -415,7 +416,7 @@ export default {
       this.isHidd = !this.isHidd
       this.startrtime = start
       this.endrtime = end
-      this.query.ctrime = [start, end]
+      this.query.stime = [parseTime(date[0]), parseTime(date[1])]
       this.isVisible = !this.isVisible
     },
     delInp() {

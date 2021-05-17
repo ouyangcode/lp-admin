@@ -88,5 +88,20 @@ export function disLockGameUser(passport, vercodeKey) {
     }
   })
 }
+// 会员升级
+export function upgradeUserAccount(data) {
+  return request({
+    url: '/api/lpGameUser/upgradeUserAccount',
+    method: 'get',
+    params: {
+      username: data.username,
+      newUsername: data.newUsername,
+      password: data.password,
+      repassword: data.repassword,
+      email: data.email,
+      vercodeKey: data.vercodeKey
+    }
+  })
+}
 
-export default { add, edit, del, updatePass, updateEmail, gameUserCleanCache, lockGameUser, disLockGameUser, getGameUserPlayGames }
+export default { add, edit, del, updatePass, updateEmail, gameUserCleanCache, lockGameUser, disLockGameUser, getGameUserPlayGames, upgradeUserAccount }

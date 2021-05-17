@@ -4,13 +4,29 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
+        <el-input v-model="query.packagenamea" clearable placeholder="packagenamea" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <el-input v-model="query.gamecode" clearable placeholder="gamecode" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
-        <el-input v-model="query.packagename" clearable placeholder="packagename" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-input v-model="query.packagenameb" clearable placeholder="packagenameb" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select
+          v-model="query.tag"
+          clearable
+          size="small"
+          placeholder="是否打开"
+          class="filter-item"
+          style="width: 120px"
+        >
+          <el-option
+            v-for="item in isdisableList"
+            :key="item.key"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
         <rrOperation :crud="crud" />
         <el-button
           v-if="crud.optShow.download"
           :loading="crud.downloadLoading"
-          :disabled="!checkPer(['admin','transactionExchangerateDict:add'])"
+          :disabled="!checkPer(['admin','googlepayConfigInfo:add'])"
           class="filter-item postin"
           size="mini"
           type="primary"
@@ -23,9 +39,8 @@
       <!--表单组件-->
       <el-dialog
         :visible.sync="isShowDelg"
-        :rules="rules"
-        width="750px"
-        top="5vh"
+        width="670px"
+        top="1vh"
         height="95%"
         :title="dlogTitle"
       >
@@ -36,22 +51,32 @@
           size="small"
           label-width="120px"
         >
-          <el-form-item label="currencyName">
-            <el-input v-model="scopeData.currencyname" placeholder="请输入汇率名" style="width: 80%" />
+          <el-form-item label="游戏包(packagenameA)">
+            <el-input v-model="scopeData.packagenamea" placeholder="请输入游戏包(packagenameA)" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="currencyCode">
-            <el-input v-model="scopeData.currencycode" placeholder="请输入汇率代码" style="width: 80%" />
+          <el-form-item label="gamecode">
+            <el-input v-model="scopeData.gamecode" placeholder="请输入gamecode" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="currencyRate">
-            <el-input v-model="scopeData.currencyrate" placeholder="请输入汇率值" style="width: 80%" />
+          <el-form-item label="sitecode">
+            <el-input v-model="scopeData.sitecode" placeholder="请输入sitecode" style="width: 80%" />
           </el-form-item>
-          <el-form-item label="是否有效">
-            <el-radio v-model="scopeData.stag" :label="0">正常</el-radio>
-            <el-radio v-model="scopeData.stag" :label="1">冻结</el-radio>
+          <el-form-item label="tag">
+            <el-radio v-model="scopeData.tag" :label="0">关闭</el-radio>
+            <el-radio v-model="scopeData.tag" :label="1">打开</el-radio>
           </el-form-item>
-          <el-form-item label="操作密钥">
-            <el-input v-model="scopeData.mykey" placeholder="请输入操作密钥" style="width: 80%" />
+          <el-form-item label="url">
+            <el-input v-model="scopeData.url" placeholder="请输入url" style="width: 80%" />
           </el-form-item>
+          <el-form-item label="param">
+            <el-input v-model="scopeData.param" placeholder="请输入param" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="小钱包(packagenameB)">
+            <el-input v-model="scopeData.packagenameb" placeholder="请输入小钱包(packagenameB)" style="width: 80%" />
+          </el-form-item>
+          <el-form-item label="gdesc">
+            <el-input v-model="scopeData.gdesc" placeholder="请输入gdesc" style="width: 80%" />
+          </el-form-item>
+
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeTip">取消</el-button>
@@ -65,24 +90,21 @@
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" border :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column align="center" prop="index" label="序号" />
-        <el-table-column align="center" prop="currencyname" label="currencyName" width="120px" />
-        <el-table-column align="center" prop="currencycode" label="currencyCode" width="120px" />
-        <el-table-column align="center" prop="currencyrate" label="currencyRate" width="120px" />
-        <el-table-column align="center" prop="pw" label="pw" width="240px" />
-        <el-table-column align="center" prop="stag" label="状态">
+        <el-table-column align="center" prop="packagenamea" label="游戏包(packagenameA)" width="220px" />
+        <el-table-column align="center" prop="gamecode" label="gamecode" width="120px" />
+        <el-table-column align="center" prop="sitecode" label="sitecode" width="150px" />
+        <el-table-column align="center" prop="url" label="url" width="200px" />
+        <el-table-column align="center" prop="crtime" label="crtime" width="150px" />
+        <el-table-column align="center" prop="tag" label="tag" width="110px">
           <template slot-scope="scope">
-            <div v-if="scope.row.stag === 0">{{ "开放" }}</div>
-            <div v-if="scope.row.stag === 1">{{ "禁用" }}</div>
+            <div v-if="scope.row.tag === 0">{{ "关闭" }}</div>
+            <div v-if="scope.row.tag === 1">{{ "打开" }}</div>
           </template>
         </el-table-column>
-        <el-table-column align="center" prop="cacheInfo" label="Redis缓存值" width="350px">
-          <template slot-scope="scope">
-            <span>{{ scope.row.cacheInfo }}</span><span v-if="scope.row.isfix === '✔'" style="color:green">{{ scope.row.isfix }}</span>
-            <span v-if="scope.row.isfix === '×'" style="color:red">{{ scope.row.isfix }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="suser" label="操作人" width="120px" />
-        <el-table-column align="center" prop="stime" label="stime" width="150px" />
+        <el-table-column align="center" prop="param" label="param" width="180px" />
+        <el-table-column align="center" prop="packagenameb" label="小钱包(packagenameB)" width="220px" />
+        <el-table-column align="center" prop="gdesc" label="gdesc" />
+        <el-table-column align="center" prop="param2" label="param2" />
         <el-table-column label="操作" width="90px" align="center" fixed="right">
           <template slot-scope="scope">
             <el-popover
@@ -99,7 +121,7 @@
                   <el-button
                     size="mini"
                     type="primary"
-                    :disabled="!checkPer(['admin','transactionExchangerateDict:edit'])"
+                    :disabled="!checkPer(['admin','googlepayConfigInfo:edit'])"
                     icon="el-icon-edit"
                     @click="editGameServerInfo(scope.row)"
                   >编辑</el-button>
@@ -116,43 +138,44 @@
 </template>
 
 <script>
-import { crudTransactionExchangerateDictList, add, edit } from '@/api/lpconfig/commonconfig/getTransactionExchangerateDictList'
+import { crudGooglepayConfigInfo, add, edit } from '@/api/lpconfig/commonconfig/getGooglepayConfigInfoList'
 import { parseTime } from '@/utils/index'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 
-const defaultForm = { id: null, channel: null, status: null, content: null, name: null, paykey: null, serverIp: null }
+const defaultForm = { packagenamea: null, gamecode: null, sitecode: null, url: null, crtime: null, tag: null, param: null, packagenameb: null, gdesc: null, param2: null }
 export default {
-  name: 'TransactionExchangerateDictList',
+  name: 'GooglepayConfigInfo',
   components: { pagination, crudOperation, rrOperation },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   cruds() {
-    return CRUD({ title: 'TransactionExchangerateDictList', url: '/api/lpTransactionExchangerateDict/getTransactionExchangerateDictList', idField: 'id', sort: 'id,desc', crudMethod: { ...crudTransactionExchangerateDictList }})
+    return CRUD({ title: 'googlepayConfigInfo', url: '/api/lpGooglepayConfigInfo/getGooglepayConfigInfoList', idField: 'id', sort: 'id,desc', crudMethod: { ...crudGooglepayConfigInfo }})
   },
   data() {
     return {
       permission: {
-        add: ['admin', 'transactionChannel:add'],
-        edit: ['admin', 'transactionChannel:edit'],
-        del: ['admin', 'transactionChannel:del']
+        add: ['admin', 'googlepayConfigInfo:add'],
+        edit: ['admin', 'googlepayConfigInfo:edit'],
+        del: ['admin', 'googlepayConfigInfo:del']
       },
       rules: {
-        mykey: [
-          { required: true, message: '请输入密钥', trigger: 'blur' }
-        ]
       },
       queryTypeOptions: [
-        { key: 'channel', display_name: 'channel' }
+        { key: 'packagenamea', display_name: 'packagenamea' },
+        { key: 'gamecode', display_name: 'gamecode' },
+        { key: 'packagenameb', display_name: 'packagenameb' }
       ],
       isShowDelg: false,
       isShow: false,
-      scopeData: {
-        currencyname: null, currencycode: null, currencyrate: null, stag: null, mykey: null, id: null
-      },
+      scopeData: { packagenamea: null, gamecode: null, sitecode: null, url: null, crtime: null, tag: null, param: null, packagenameb: null, gdesc: null, param2: null },
       curdHook: '',
-      dlogTitle: ''
+      dlogTitle: '',
+      isdisableList: [
+        { label: '打开', value: 1 },
+        { label: '关闭', value: 0 }
+      ]
     }
   },
   methods: {
@@ -179,38 +202,28 @@ export default {
     getServiceValue() {
       switch (this.curdHook) {
         case 'add':
-          this.scopeData.stime = parseTime(new Date())
+          this.scopeData.crtime = parseTime(new Date())
+          console.log(this.scopeData.crtime)
           add(this.scopeData).then((res) => {
-            if (res.code === '1') {
-              this.$notify({
-                title: '警告',
-                message: res.msg,
-                type: 'warning'
-              })
-            } else {
-              this.crud.addSuccessNotify()
-            }
+            this.crud.addSuccessNotify()
             this.isShowDelg = !this.isShowDelg
             for (var key in this.scopeData) {
               this.scopeData[key] = null
             }
             this.crud.refresh()
+          }).catch((err) => {
+            console.log(err)
+            // this.$message({
+            //   message: err,
+            //   type: 'warning'
+            // })
           })
           break
         case 'edit':
           console.log(this.scopeData)
           edit(this.scopeData)
             .then((res) => {
-              if (res.code === '1') {
-                this.$notify({
-                  title: '警告',
-                  message: res.msg,
-                  type: 'warning'
-                })
-              } else {
-                this.crud.editSuccessNotify()
-              }
-
+              this.crud.editSuccessNotify()
               this.isShowDelg = !this.isShowDelg
               for (var key in this.scopeData) {
                 this.scopeData[key] = null
@@ -276,7 +289,7 @@ export default {
 
 ::v-deep .el-dialog__wrapper {
   .el-dialog {
-    height: 66%;
+    height: 80%;
     overflow: auto;
     .el-dialog__header {
       padding: 20px;
@@ -322,4 +335,3 @@ export default {
   }
 }
 </style>
-

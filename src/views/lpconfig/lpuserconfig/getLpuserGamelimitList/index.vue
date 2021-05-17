@@ -4,8 +4,22 @@
     <div class="head-container">
       <div v-if="crud.props.searchToggle">
         <!-- 搜索 -->
-
         <el-input v-model="query.userid" clearable placeholder="请输入用户id" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
+        <el-select
+          v-model="query.status"
+          clearable
+          size="small"
+          placeholder="是否删除"
+          class="filter-item"
+          style="width: 120px"
+        >
+          <el-option
+            v-for="item in sitecodeList"
+            :key="item.key"
+            :label="item.id"
+            :value="item.type"
+          />
+        </el-select>
         <rrOperation :crud="crud" />
       </div>
       <el-button
@@ -168,6 +182,10 @@ export default {
         { label: '停止运营', value: 3 },
         { label: '热门推荐', value: 5 }
       ],
+      sitecodeList: [
+        { id: '删除', type: '1' },
+        { id: '正常', type: '0' }
+      ],
       fileList: [],
       permission: {
         add: ['admin', 'gameRoom:add'],
@@ -187,8 +205,8 @@ export default {
         { key: 'runstate', display_name: 'runstate' }
       ],
       statusList: [
-        { label: '正常', value: '0' },
-        { label: '删除', value: '1' }
+        { label: '0', value: '正常' },
+        { label: '1', value: '删除' }
       ],
       curdHook: '',
       checkedCities: [],
@@ -241,9 +259,9 @@ export default {
     getServiceValue() {
       switch (this.curdHook) {
         case 'add':
-          console.log(this.scopeData)
+          this.scopeData.gamecode = this.changeArr
           this.scopeData.ctime = parseTime(new Date())
-          if (this.scopeData.userid && this.scopeData.status && this.scopeData.gamecode) {
+          if (this.scopeData.userid && this.scopeData.status) {
             add(this.scopeData).then((res) => {
               this.crud.addSuccessNotify()
               this.isShowDelg = !this.isShowDelg
@@ -258,7 +276,6 @@ export default {
               type: 'warning'
             })
           }
-
           break
         case 'edit':
           this.scopeData.gamecode = this.changeArr

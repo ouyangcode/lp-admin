@@ -63,12 +63,18 @@
         <el-table-column align="center" prop="addr1" label="点数" />
         <el-table-column v-if="isShow" align="center" prop="lpoint" label="点数" />
         <el-table-column align="center" prop="roleid" label="角色ID" />
-        <el-table-column align="center" prop="rolename" label="角色名" />
+        <el-table-column align="center" prop="rolename" label="角色名" width="120px" />
         <el-table-column align="center" prop="createtime" label="创建时间" width="150px" />
         <el-table-column align="center" prop="confimroleid" label="确认人id" />
-        <el-table-column align="center" prop="confimrolename" label="确认人名字" width="110px" />
+        <el-table-column align="center" prop="confimrolename" label="确认人名字" width="120px" />
         <el-table-column align="center" prop="confimtime" label="确认时间" width="150px" />
-        <el-table-column align="center" prop="status" label="状态" />
+        <el-table-column align="center" prop="status" label="状态">
+          <template slot-scope="scope">
+            <div v-if="scope.row.status === 0">{{ '订单申请' }}</div>
+            <div v-if="scope.row.status === 1">{{ '转点成功' }}</div>
+            <div v-if="scope.row.status === 2">{{ '拒绝转点' }}</div>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="ipaddress" label="申请IP" width="130px" />
         <el-table-column align="center" prop="confimipaddress" label="确认IP" width="130px" />
         <el-table-column align="center" prop="addr2" label="addr2" />

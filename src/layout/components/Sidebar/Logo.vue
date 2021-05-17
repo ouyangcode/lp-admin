@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      title: 'LP-后台管理',
+      title: 'DM-后台管理',
       logo: Logo
     }
   }

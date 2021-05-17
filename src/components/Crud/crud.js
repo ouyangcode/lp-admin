@@ -2,10 +2,7 @@ import {
   initData,
   download
 } from '@/api/data'
-import { parseTime, downloadFile, setDefaultStratime, setDefaultEndtime } from '@/utils/index'
-import {
-  Object
-} from 'core-js'
+import { parseTime, parseTimes, downloadFile, setDefaultStratime, setDefaultEndtime } from '@/utils/index'
 import Vue from 'vue'
 
 /**
@@ -256,6 +253,101 @@ function CRUD(options) {
             var shiftData = { gameName: '所有游戏', gameCode: 'allgame' }
             data.gameCodeList.unshift(shiftData)
             crud.data.gameCodeList = data.gameCodeList
+          } else if (crud.url === '/api/gmDateRetainedReport/reportList') {
+            if (Object.keys(data.content).length === 0) {
+              crud.data = []
+            } else {
+              var daySort
+              var getDataLength = Object.keys(data.content).length
+              if (crud.getQueryParams().sdate) {
+                daySort = crud.getDataSort(new Date(crud.getQueryParams().sdate[0]), new Date(crud.getQueryParams().sdate[1]))
+              } else {
+                daySort = crud.getDataSort(getDataLength)
+              }
+              var setarr = []
+              arrs = []
+              var dateList = Object.keys(data.content)
+              daySort.timeList.forEach((item, index) => {
+                setarr[index] = data.content[item]
+                dateList.forEach((items, indexs) => {
+                  if (item === items) {
+                    setarr.forEach((sz, szindex) => {
+                      sz.forEach((data, i) => {
+                        sz[i] = (sz[i] * 100).toFixed(2)
+                        arrs[index] = {
+                          date: items,
+                          index0: sz[0],
+                          index1: sz[1],
+                          index2: sz[2],
+                          index3: sz[3],
+                          index4: sz[4],
+                          index5: sz[5],
+                          index6: sz[6],
+                          index7: sz[7],
+                          index8: sz[8],
+                          index9: sz[9],
+                          index10: sz[10],
+                          index11: sz[11],
+                          index12: sz[12],
+                          index13: sz[13],
+                          index14: sz[14],
+                          index15: sz[15],
+                          index16: sz[16]
+                        }
+                      })
+                    })
+                  }
+                })
+              })
+              crud.data = arrs
+              console.log(crud.data)
+            }
+          } else if (crud.url === '/api/gmDateLTVReport/reportList') {
+            if (Object.keys(data.content).length === 0) {
+              crud.data = []
+            } else {
+              getDataLength = Object.keys(data.content).length
+              console.log(getDataLength)
+              daySort
+              if (crud.getQueryParams().sdate) {
+                daySort = crud.getDataSort(new Date(crud.getQueryParams().sdate[0]), new Date(crud.getQueryParams().sdate[1]))
+              } else {
+                daySort = crud.getDataSort(getDataLength)
+              }
+              console.log(daySort)
+              setarr = []
+              arrs = []
+              dateList = Object.keys(data.content)
+              daySort.timeList.forEach((item, index) => {
+                setarr[index] = data.content[item]
+                dateList.forEach((items, indexs) => {
+                  if (item === items) {
+                    setarr.forEach((sz, szindex) => {
+                      sz.forEach((data, i) => {
+                        arrs[index] = {
+                          date: items,
+                          index0: sz[0],
+                          index1: sz[1],
+                          index2: sz[2],
+                          index3: sz[3],
+                          index4: sz[4],
+                          index5: sz[5],
+                          index6: sz[6],
+                          index7: sz[7],
+                          index8: sz[8],
+                          index9: sz[9],
+                          index10: sz[10],
+                          index11: sz[11],
+                          index12: sz[12]
+                        }
+                      })
+                    })
+                  }
+                })
+              })
+              crud.data = arrs
+              console.log(crud.data)
+            }
           } else {
             data.content.forEach((item, index) => {
               item.index = (crud.page.page - 1) * crud.page.size + index + 1
@@ -300,6 +392,34 @@ function CRUD(options) {
       })
 
       return arrs
+    },
+    /** 获取时间差 */
+    getDataSort(stime, etime) {
+      var diff = etime - stime
+      var days = Math.ceil(diff / (24 * 3600 * 1000))
+      var first
+      var getDay
+      var nowDay
+      var timeList = []
+      var upData = {}
+      if (stime && etime) {
+        first = stime.getTime()
+        for (let i = 0; i < days; i++) {
+          getDay = first + (i * 3600 * 1000 * 24)
+          timeList[i] = parseTimes(getDay)
+        }
+      } else {
+        nowDay = new Date().getTime()
+        first = nowDay - (arguments[0] * 3600 * 1000 * 24)
+        for (let i = 1; i <= arguments[0]; i++) {
+          getDay = first + (i * 3600 * 1000 * 24)
+          timeList[i] = parseTimes(getDay)
+        }
+      }
+
+      upData.timeList = timeList
+      upData.length = days
+      return upData
     },
     putObjectT(obj, url) {
       const getArr = Object.entries(obj)
@@ -516,10 +636,8 @@ function CRUD(options) {
       })
       const getData = new Date()
       const getEndData = new Date()
-
       crud.defaultStart = setDefaultStratime(getData.setTime(getData.getTime() - 3600 * 1000 * 24 * 7))
       crud.defaultEnd = setDefaultEndtime(getEndData)
-
       if (crud.url === '/api/lpidcDomain/getLpidcDomainList') {
         return {
           page: crud.page.page - 1,
@@ -634,6 +752,33 @@ function CRUD(options) {
           size: crud.page.size,
           sort: crud.sort,
           time: [crud.defaultStart, crud.defaultEnd],
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/lpmobilephone/getLpmobilephoneList') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          isdisable: 0,
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/lpuserGamelimit/getLpuserGamelimitList') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          status: '0',
+          ...crud.query,
+          ...crud.params
+        }
+      } else if (crud.url === '/api/lpGooglepayConfigInfo/getGooglepayConfigInfoList') {
+        return {
+          page: crud.page.page - 1,
+          size: crud.page.size,
+          sort: crud.sort,
+          tag: 1,
           ...crud.query,
           ...crud.params
         }
